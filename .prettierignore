@@ -1,0 +1,12 @@
+# Add files here to ignore them from prettier formatting
+dist
+build
+coverage
+reports
+apps/api/.env
+/.turbo/**
+
+# Specific to your monorepo structure
+apps/web/public/
+packages/*/dist/
+packages/*/build/

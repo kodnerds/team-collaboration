@@ -1,0 +1,26 @@
+{
+  "name": "@tc/api",
+  "version": "0.0.1",
+  "description": "Team collaboration API",
+  "type": "commonjs",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.2",
+    "pg": "^8.14.1",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "0.3.27"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/node": "^22.13.10",
+    "nodemon": "^3.1.11",
+    "tsx": "^4.20.6",
+    "typescript": "^5.8.2",
+    "@tc/eslint-config": "*",
+    "@tc/typescript-config": "*"
+  },
+  "scripts": {
+    "dev": "nodemon",
+    "typeorm": "typeorm-ts-node-commonjs"
+  }
+}
