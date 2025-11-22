@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import envConfig from './config/envConfig';
 import { connectToDatabase } from './database';
 import routes from './routes';
+import logger from './utils/logger';
 
 const PORT = envConfig.PORT || 3001;
 
@@ -25,8 +26,7 @@ const main = async () => {
   app.use('/api/v1', routes);
 
   app.listen(PORT, () => {
-    // eslint-disable-next-line no-console
-    console.info(`Api running on http://localhost:${PORT}`);
+    logger.info(`Api running on http://localhost:${PORT}`);
   });
 };
 

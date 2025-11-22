@@ -10,7 +10,8 @@
     "helmet": "^8.1.0",
     "pg": "^8.14.1",
     "reflect-metadata": "^0.2.2",
-    "typeorm": "0.3.27"
+    "typeorm": "0.3.27",
+    "winston": "^3.18.3"
   },
   "devDependencies": {
     "@tc/eslint-config": "*",
