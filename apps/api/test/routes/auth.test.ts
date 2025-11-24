@@ -106,3 +106,108 @@ describe('POST /auth/login', () => {
     expect(response.body.data).not.toHaveProperty('password');
   });
 });
+
+describe('POST /auth/signup', () => {
+  const factory: TestFactory = new TestFactory();
+
+  beforeAll(async () => {
+    await factory.init();
+  });
+
+  afterAll(async () => {
+    await factory.close();
+  });
+
+  beforeEach(async () => {
+    await factory.reset();
+  });
+
+  it('should create a new user successfully', async () => {
+    const response = await factory.app.post('/auth/signup').send({
+      name: 'John Doe',
+      email: 'john@gmail.com',
+      password: '123456',
+      avatarUrl: 'https://example.com/avatar.png'
+    });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty('message', 'User created successfully');
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data).toHaveProperty('id');
+    expect(response.body.data).toHaveProperty('name', 'John Doe');
+    expect(response.body.data).not.toHaveProperty('password');
+    expect(response.body.data).not.toHaveProperty('email');
+  });
+
+  it('should return 409 when email already exists', async () => {
+    await createTestUser(factory, {
+      name: 'Existing User',
+      email: 'existing@gmail.com'
+    });
+
+    const response = await factory.app.post('/auth/signup').send({
+      name: 'Another User',
+      email: 'existing@gmail.com',
+      password: '123456'
+    });
+
+    expect(response.status).toBe(409);
+    expect(response.body).toHaveProperty('message', 'User with this email already exists');
+  });
+
+  it('should return 400 for validation errors', async () => {
+    const testCases = [
+      { payload: { email: 'john@gmail.com', password: '123456' }, errorMsg: 'Name is required' },
+      { payload: { name: 'John Doe', password: '123456' }, errorMsg: 'Email is required' },
+      { payload: { name: 'John Doe', email: 'john@gmail.com' }, errorMsg: 'Password is required' },
+      {
+        payload: { name: 'John Doe', email: 'invalid-email', password: '123456' },
+        errorMsg: 'Please enter a valid email address'
+      },
+      {
+        payload: { name: 'John Doe', email: 'john@gmail.com', password: '12345' },
+        errorMsg: 'Password must be at least 6 characters'
+      },
+      {
+        payload: {
+          name: 'John Doe',
+          email: 'john@gmail.com',
+          password: '123456',
+          avatarUrl: 'not-a-url'
+        },
+        errorMsg: 'Avatar URL must be a valid URL'
+      }
+    ];
+
+    for (const testCase of testCases) {
+      const response = await factory.app.post('/auth/signup').send(testCase.payload);
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('status', 'error');
+      expect(response.body).toHaveProperty('message', 'Validation error');
+      expect(response.body.errors).toContain(testCase.errorMsg);
+    }
+  });
+
+  it('should hash password and not expose sensitive information', async () => {
+    const password = '123456';
+    const response = await factory.app.post('/auth/signup').send({
+      name: 'John Doe',
+      email: 'john@gmail.com',
+      password,
+      avatarUrl: 'https://example.com/avatar.png'
+    });
+
+    expect(response.status).toBe(201);
+
+    const userRepository = factory._connection.getRepository('UserEntity');
+    const user = await userRepository.findOne({ where: { email: 'john@gmail.com' } });
+
+    expect(user?.password).not.toBe(password);
+    expect(user?.password.length).toBeGreaterThan(password.length);
+
+    const responseString = JSON.stringify(response.body);
+    expect(responseString).not.toContain(password);
+    expect(responseString).not.toContain('john@gmail.com');
+  });
+});
