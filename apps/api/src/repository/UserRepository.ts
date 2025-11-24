@@ -13,4 +13,14 @@ export class UserRepository {
   async findOneByEmail(email: string): Promise<UserEntity | null> {
     return await this.repository.findOneBy({ email });
   }
+
+  async create(userData: {
+    name: string;
+    email: string;
+    password: string;
+    avatarUrl?: string;
+  }): Promise<UserEntity> {
+    const user = this.repository.create(userData);
+    return await this.repository.save(user);
+  }
 }
