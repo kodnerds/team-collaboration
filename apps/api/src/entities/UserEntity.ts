@@ -11,16 +11,16 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 100 })
+  @Column()
   name: string;
 
   @Column({ unique: true, length: 150 })
   email: string;
 
-  @Column({ length: 255 })
+  @Column()
   password: string;
 
-  @Column()
+  @Column({ nullable: true })
   avatarUrl?: string;
 
   @CreateDateColumn()

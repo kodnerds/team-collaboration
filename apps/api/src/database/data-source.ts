@@ -14,7 +14,9 @@ export const AppDataSource = new DataSource({
   database: envConfig.POSTGRES_DB,
   synchronize: true,
   logging: false,
-  entities: [process.env.NODE_ENV === 'production' ? 'dist/entity/**/*.js' : 'src/entity/**/*.ts'],
+  entities: [
+    process.env.NODE_ENV === 'production' ? 'dist/entities/**/*.js' : 'src/entities/**/*.ts'
+  ],
   migrations: [],
   subscribers: []
 });
@@ -25,7 +27,8 @@ export const testDatabaseConfig: DataSourceOptions = {
   port: 2345,
   username: 'root',
   database: 'test',
-  password: process.env.TEST_DB_PASSWORD || 'easypass',
+  // eslint-disable-next-line sonarjs/no-hardcoded-passwords
+  password: 'easypass',
   synchronize: true,
   dropSchema: true,
   entities: ['src/entities/**/*.ts']

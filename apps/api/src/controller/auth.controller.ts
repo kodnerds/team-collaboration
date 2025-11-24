@@ -34,8 +34,8 @@ export const login = async (req: Request, res: Response) => {
     return res.status(HTTP_STATUS.OK).json({
       message: 'Login successful',
       data: {
-        id: '123456789',
-        name: 'John Doe'
+        id: payload.id,
+        name: payload.name
       },
       accessToken: token
     });

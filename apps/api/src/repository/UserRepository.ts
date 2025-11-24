@@ -1,5 +1,5 @@
 import { connect } from '../database';
-import { UserEntity } from '../entity';
+import { UserEntity } from '../entities';
 
 import type { Repository } from 'typeorm';
 
