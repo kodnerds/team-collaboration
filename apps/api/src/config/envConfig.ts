@@ -2,7 +2,7 @@ import { cleanEnv, port, str } from 'envalid';
 import 'dotenv/config';
 
 const envConfig = cleanEnv(process.env, {
-  PORT: port(),
+  PORT: port({ default: 3000 }),
   NODE_ENV: str({ choices: ['development', 'production', 'test'] }),
   POSTGRES_USER: str({ default: undefined }),
   POSTGRES_PASSWORD: str({ default: undefined }),

@@ -39,14 +39,15 @@ jobs:
       - name: 🏗️ Build dist
         run: npm run build
 
-#      - name: 🧪 Run tests
-#        env:
-#          NODE_ENV: test
-#          POSTGRES_HOST: localhost
-#          POSTGRES_PORT: 5432
-#          POSTGRES_USER: test
-#          POSTGRES_PASSWORD: test
-#          POSTGRES_DB: test
-#          PORT: 3000
-#          ACCESS_TOKEN_SECRET: 'test-secret'
-#        run: npm test
+      - name: 🧪 Run tests
+        env:
+          NODE_ENV: test
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+          PORT: 3000
+          ACCESS_TOKEN_SECRET: 'test-secret'
+          LOG_LEVEL: 'debug'
+        run: npm test

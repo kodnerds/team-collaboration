@@ -18,7 +18,7 @@ services:
       - /app/apps/api/node_modules
     depends_on:
       - postgres
-    command: npm run dev
+    command: npm run dev:local
 
   postgres:
     container_name: tc-postgres
