@@ -1,6 +1,9 @@
-import { DataSource, type DataSourceOptions } from 'typeorm';
+import 'reflect-metadata';
+import { DataSource } from 'typeorm';
 
 import envConfig from '../config/envConfig';
+
+import type { DataSourceOptions } from 'typeorm';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -11,9 +14,7 @@ export const AppDataSource = new DataSource({
   database: envConfig.POSTGRES_DB,
   synchronize: true,
   logging: false,
-  entities: [
-    envConfig.NODE_ENV === 'production' ? 'dist/entities/**/*.js' : 'src/entities/**/*.ts'
-  ],
+  entities: [process.env.NODE_ENV === 'production' ? 'dist/entity/**/*.js' : 'src/entity/**/*.ts'],
   migrations: [],
   subscribers: []
 });
@@ -24,8 +25,7 @@ export const testDatabaseConfig: DataSourceOptions = {
   port: 2345,
   username: 'root',
   database: 'test',
-  // eslint-disable-next-line sonarjs/no-hardcoded-passwords
-  password: 'easypass',
+  password: process.env.TEST_DB_PASSWORD || 'easypass',
   synchronize: true,
   dropSchema: true,
   entities: ['src/entities/**/*.ts']

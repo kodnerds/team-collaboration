@@ -3,7 +3,7 @@ import express, { urlencoded, json } from 'express';
 import helmet from 'helmet';
 
 import envConfig from './config/envConfig';
-import { connectToDatabase } from './database';
+import { AppDataSource } from './database';
 import routes from './routes';
 import logger from './utils/logger';
 
@@ -14,7 +14,7 @@ const main = async () => {
 
   app.use(helmet());
 
-  await connectToDatabase();
+  await AppDataSource.initialize();
 
   app.use(json());
   app.use(urlencoded({ extended: true }));
