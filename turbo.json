@@ -1,7 +1,18 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
-  "globalEnv": ["CI"],
+  "globalEnv": [
+    "CI",
+    "NODE_ENV",
+    "ACCESS_TOKEN_SECRET",
+    "PORT",
+    "LOG_LEVEL",
+    "POSTGRES_USER",
+    "POSTGRES_PASSWORD",
+    "POSTGRES_DB",
+    "POSTGRES_PORT",
+    "POSTGRES_HOST"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -10,6 +21,9 @@
     },
     "lint": {
       "dependsOn": ["^lint"]
+    },
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"]
     },
     "test": {
       "dependsOn": ["^test"],

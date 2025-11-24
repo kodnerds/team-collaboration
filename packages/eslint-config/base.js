@@ -119,6 +119,12 @@ export const config = [
     }
   },
   {
+    files: ['**/*.test.ts', '**/*.spec.ts'],
+    rules: {
+      'sonarjs/no-hardcoded-passwords': 'off'
+    }
+  },
+  {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     languageOptions: {
       parserOptions: {

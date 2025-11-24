@@ -1,13 +1,10 @@
 import { Router } from 'express';
 
-import type { Request, Response } from 'express';
+import { login } from '../controller';
+import { loginValidator, validate } from '../middleware';
 
 const router = Router();
 
-router.get('/', (_: Request, res: Response) =>
-  res.send({
-    message: 'Users route is working!'
-  })
-);
+router.post('/login', loginValidator, validate, login);
 
 export default router;

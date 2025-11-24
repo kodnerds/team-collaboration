@@ -1,12 +1,10 @@
-import { AppDataSource } from './data-source';
+import envConfig from '../config/envConfig';
 
-export const connectToDatabase = async () => {
-  try {
-    await AppDataSource.initialize();
-    // eslint-disable-next-line no-console
-    console.info('Database connection established successfully 🚀');
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to initialize AppDataSource:', error);
-  }
-};
+import { AppDataSource, TestDataSource } from './data-source';
+
+import type { EntityTarget, ObjectLiteral, Repository } from 'typeorm';
+
+export const connect = <T extends ObjectLiteral>(entity: EntityTarget<T>): Repository<T> =>
+  envConfig.isTest
+    ? TestDataSource.manager.getRepository(entity)
+    : AppDataSource.manager.getRepository(entity);
