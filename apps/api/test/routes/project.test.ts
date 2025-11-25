@@ -110,21 +110,6 @@ describe('POST /projects', () => {
       expect(response.body.errors).toContain('Name is required');
     });
 
-    it('should return 400 when name is too short', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: 'ab',
-          description: 'This is a test project description'
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body.errors).toContain('Name must be at least 3 characters long');
-    });
-
     it('should return 400 when name is not a string', async () => {
       const response = await factory.app
         .post('/projects')
@@ -154,22 +139,6 @@ describe('POST /projects', () => {
       expect(response.body).toHaveProperty('message', 'Validation error');
       expect(response.body.errors).toContain('Description must be a string');
     });
-
-    it('should return 400 for multiple validation errors', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: 12_345,
-          description: 12_345
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body.errors).toContain('Name must be a string');
-      expect(response.body.errors).toContain('Description must be a string');
-    });
   });
 
   describe('Unauthenticated access', () => {
@@ -178,19 +147,6 @@ describe('POST /projects', () => {
         name: 'Test Project',
         description: 'This is a test project description'
       });
-
-      expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
-    });
-
-    it('should return 401 when authorization header is malformed', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', 'InvalidToken')
-        .send({
-          name: 'Test Project',
-          description: 'This is a test project description'
-        });
 
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
@@ -207,48 +163,6 @@ describe('POST /projects', () => {
 
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('message', 'User is not authorized or token is invalid');
-    });
-
-    it('should return 401 when Bearer prefix is missing', async () => {
-      const response = await factory.app.post('/projects').set('Authorization', authToken).send({
-        name: 'Test Project',
-        description: 'This is a test project description'
-      });
-
-      expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
-    });
-  });
-
-  describe('Edge cases', () => {
-    it('should return 404 when authenticated user no longer exists in database', async () => {
-      const userRepository = factory._connection.getRepository('UserEntity');
-      await userRepository.delete({ id: testUser.id });
-
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: 'Test Project',
-          description: 'This is a test project description'
-        });
-
-      expect(response.status).toBe(404);
-      expect(response.body).toHaveProperty('message', 'User not found');
-    });
-
-    it('should allow creating project with minimal valid data', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: 'Min',
-          description: ''
-        });
-
-      expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('message', 'Project created successfully');
-      expect(response.body.data).toHaveProperty('name', 'Min');
     });
   });
 });

@@ -6,14 +6,10 @@ import type { Request, Response } from 'express';
 export const createProject = async (req: Request, res: Response) => {
   try {
     const { name, description } = req.body;
-    const authenticatedUser = req.user;
-
-    if (!authenticatedUser) {
-      return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: 'User is not authorized' });
-    }
+    const { id } = req.user;
 
     const userRepository = new UserRepository();
-    const user = await userRepository.findById(authenticatedUser.id);
+    const user = await userRepository.findById(id);
 
     if (!user) {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'User not found' });

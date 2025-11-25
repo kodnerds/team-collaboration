@@ -9,7 +9,7 @@ import {
 
 import { UserEntity } from './UserEntity';
 
-@Entity()
+@Entity({ name: 'project' })
 export class ProjectEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -20,7 +20,7 @@ export class ProjectEntity {
   @Column()
   description: string;
 
-  @ManyToOne(() => UserEntity)
+  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   createdBy: UserEntity;
 
   @CreateDateColumn()
