@@ -12,6 +12,8 @@ RUN npm install
 
 WORKDIR /app/apps/api
 
+RUN npm install
+
 RUN npm run build
 
 FROM base as production
