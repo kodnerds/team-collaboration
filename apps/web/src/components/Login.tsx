@@ -85,7 +85,7 @@ const Login = () => {
             background: isSubmitting ? '#999' : '#0a66c2',
             color: 'white',
             border: 'none',
-            cursor: isSubmitting ? 'not-allowed' : 'pointer',
+            cursor: isSubmitting ? 'not-allowed' : 'pointer'
           }}
         >
           {isSubmitting ? 'Logging in…' : 'Login'}
