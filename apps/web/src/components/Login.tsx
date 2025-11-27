@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 const Login = () => {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(''); 
+  const [password, setPassword] = useState<string | null>(null); 
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Email regex
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  // Safe, linear regex for email validation
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -21,7 +21,7 @@ const Login = () => {
       newErrors.email = 'Enter a valid email address';
     }
 
-    if (!password.trim()) {
+    if (!password || !password.trim()) {
       newErrors.password = 'Password is required';
     } else if (password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
@@ -53,7 +53,6 @@ const Login = () => {
     <div style={{ maxWidth: '400px', margin: '50px auto', fontFamily: 'sans-serif' }}>
       <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Login</h2>
       <form onSubmit={handleSubmit}>
-        {/* Email Input */}
         <label htmlFor="email">Email</label>
         <input
           id="email"
@@ -64,12 +63,11 @@ const Login = () => {
         />
         {errors.email && <div style={{ color: 'red', marginBottom: '10px' }}>{errors.email}</div>}
 
-        {/* Password Input */}
         <label htmlFor="password">Password</label>
         <input
           id="password"
           type="password"
-          value={password}
+          value={password ?? ''}
           onChange={(e) => setPassword(e.target.value)}
           style={{ width: '100%', padding: '8px', marginBottom: '5px', boxSizing: 'border-box' }}
         />
@@ -77,7 +75,6 @@ const Login = () => {
           <div style={{ color: 'red', marginBottom: '10px' }}>{errors.password}</div>
         )}
 
-        {/* Submit Button */}
         <button
           type="submit"
           style={{
