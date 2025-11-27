@@ -9,7 +9,7 @@ const Login = () => {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Email regex 
+  // Email regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
   const validate = () => {
@@ -42,7 +42,7 @@ const Login = () => {
       return;
     }
 
-    // Simulate login 
+    // Simulate login
     setTimeout(() => {
       setIsSubmitting(false);
       navigate('/dashboard');
@@ -73,7 +73,9 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           style={{ width: '100%', padding: '8px', marginBottom: '5px', boxSizing: 'border-box' }}
         />
-        {errors.password && <div style={{ color: 'red', marginBottom: '10px' }}>{errors.password}</div>}
+        {errors.password && (
+          <div style={{ color: 'red', marginBottom: '10px' }}>{errors.password}</div>
+        )}
 
         {/* Submit Button */}
         <button
@@ -85,7 +87,7 @@ const Login = () => {
             backgroundColor: '#007bff',
             color: '#fff',
             border: 'none',
-            cursor: 'pointer',
+            cursor: 'pointer'
           }}
           disabled={isSubmitting}
         >
@@ -94,7 +96,9 @@ const Login = () => {
       </form>
 
       <div style={{ marginTop: '15px', textAlign: 'center' }}>
-        <a href="/forgot-password" style={{ marginRight: '10px' }}>Forgot Password?</a>
+        <a href="/forgot-password" style={{ marginRight: '10px' }}>
+          Forgot Password?
+        </a>
         <a href="/signup">Create Account</a>
       </div>
     </div>
