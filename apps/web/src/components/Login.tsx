@@ -6,12 +6,11 @@ const Login = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Email regex
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Email regex 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -37,64 +36,67 @@ const Login = () => {
     setIsSubmitting(true);
 
     const validationErrors = validate();
-
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       setIsSubmitting(false);
       return;
     }
 
-    // Simulated successful login
+    // Simulate login 
     setTimeout(() => {
+      setIsSubmitting(false);
       navigate('/dashboard');
     }, 700);
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto' }}>
-      <h2>Login</h2>
-
+    <div style={{ maxWidth: '400px', margin: '50px auto', fontFamily: 'sans-serif' }}>
+      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Login</h2>
       <form onSubmit={handleSubmit}>
         {/* Email Input */}
-        <label>Email</label>
+        <label htmlFor="email">Email</label>
         <input
+          id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%', padding: '8px', marginBottom: '5px' }}
+          style={{ width: '100%', padding: '8px', marginBottom: '5px', boxSizing: 'border-box' }}
         />
-        {errors.email && <p style={{ color: 'red', marginTop: 0 }}>{errors.email}</p>}
+        {errors.email && <div style={{ color: 'red', marginBottom: '10px' }}>{errors.email}</div>}
 
         {/* Password Input */}
-        <label>Password</label>
+        <label htmlFor="password">Password</label>
         <input
+          id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ width: '100%', padding: '8px', marginBottom: '5px' }}
+          style={{ width: '100%', padding: '8px', marginBottom: '5px', boxSizing: 'border-box' }}
         />
-        {errors.password && <p style={{ color: 'red', marginTop: 0 }}>{errors.password}</p>}
+        {errors.password && <div style={{ color: 'red', marginBottom: '10px' }}>{errors.password}</div>}
 
+        {/* Submit Button */}
         <button
           type="submit"
-          disabled={isSubmitting}
           style={{
             width: '100%',
             padding: '10px',
-            marginTop: '15px',
-            background: isSubmitting ? '#999' : '#0a66c2',
-            color: 'white',
+            marginTop: '10px',
+            backgroundColor: '#007bff',
+            color: '#fff',
             border: 'none',
-            cursor: isSubmitting ? 'not-allowed' : 'pointer'
+            cursor: 'pointer',
           }}
+          disabled={isSubmitting}
         >
-          {isSubmitting ? 'Logging in…' : 'Login'}
+          {isSubmitting ? 'Logging in...' : 'Login'}
         </button>
-
-        <p style={{ marginTop: '15px' }}>
-          <a href="#">Forgot Password?</a> | <a href="#">Create Account</a>
-        </p>
       </form>
+
+      <div style={{ marginTop: '15px', textAlign: 'center' }}>
+        <a href="/forgot-password" style={{ marginRight: '10px' }}>Forgot Password?</a>
+        <a href="/signup">Create Account</a>
+      </div>
     </div>
   );
 };
