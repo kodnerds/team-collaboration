@@ -31,3 +31,11 @@ export const signupValidator = [
 
   body('avatarUrl').optional().isURL().withMessage('Avatar URL must be a valid URL')
 ];
+
+export const forgotPasswordValidator = [
+  body("email")
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Invalid email format"),
+];
