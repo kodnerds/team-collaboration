@@ -86,8 +86,7 @@ export const signup = async (req: Request, res: Response) => {
   }
 };
 
-export const forgotPassword = async (req: Request, res: Response) => {
-  console.log("hello, begginig!!1") 
+export const forgotPassword = async (req: Request, res: Response) => { 
 try {
   const { email } = req.body;
 
@@ -115,7 +114,6 @@ try {
 
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
-  console.log(resetUrl)
   await sendEmail(
     user.email,
     "Password Reset Request",
