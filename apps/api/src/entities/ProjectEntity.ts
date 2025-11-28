@@ -17,7 +17,7 @@ export class ProjectEntity {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
+  @Column()
   description: string;
 
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })

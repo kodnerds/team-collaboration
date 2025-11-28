@@ -79,41 +79,102 @@ describe('POST /projects', () => {
     });
   });
 
-  describe('Validation failures', () => {
-    const validationCases = [
-      {
-        description: 'should return 400 when name is missing',
-        payload: { description: 'This is a test project description' },
-        expectedError: 'Name is required'
-      },
-      {
-        description: 'should return 400 when name is empty string',
-        payload: { name: '', description: 'This is a test project description' },
-        expectedError: 'Name is required'
-      },
-      {
-        description: 'should return 400 when name is not a string',
-        payload: { name: 12_345, description: 'This is a test project description' },
-        expectedError: 'Name must be a string'
-      },
-      {
-        description: 'should return 400 when description is not a string',
-        payload: { name: 'Test Project', description: 12_345 },
-        expectedError: 'Description must be a string'
-      }
-    ];
+  describe('get projects', () => {
+    it('should return 200 when projects are retrieved successfully', async () => {
+      const response = await factory.app
+        .get('/projects')
+        .set('Authorization', `Bearer ${authToken}`);
 
-    it.each(validationCases)('$description', async ({ payload, expectedError }) => {
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Projects retrieved successfully');
+      expect(response.body).toHaveProperty('data');
+      expect(response.body.data).toHaveProperty('items');
+      expect(response.body.data).toHaveProperty('meta');
+      expect(response.body.data.meta).toHaveProperty('page');
+      expect(response.body.data.meta).toHaveProperty('limit');
+      expect(response.body.data.meta).toHaveProperty('total');
+      expect(response.body.data.meta).toHaveProperty('totalPages');
+    });
+
+    it('should return projects with createdBy relation excluding password', async () => {
+      await factory.app.post('/projects').set('Authorization', `Bearer ${authToken}`).send({
+        name: 'Test Project for Relation',
+        description: 'Description'
+      });
+
+      const response = await factory.app
+        .get('/projects')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      const project = response.body.data.items[0];
+      expect(project).toHaveProperty('createdBy');
+      expect(project.createdBy).toHaveProperty('id', testUser.id);
+      expect(project.createdBy).toHaveProperty('name', testUser.name);
+      expect(project.createdBy).toHaveProperty('email', testUser.email);
+      expect(project.createdBy).not.toHaveProperty('password');
+    });
+  });
+
+  describe('Validation failures', () => {
+    it('should return 400 when name is missing', async () => {
       const response = await factory.app
         .post('/projects')
         .set('Authorization', `Bearer ${authToken}`)
-        .send(payload);
+        .send({
+          description: 'This is a test project description'
+        });
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty('status', 'error');
       expect(response.body).toHaveProperty('message', 'Validation error');
       expect(response.body).toHaveProperty('errors');
-      expect(response.body.errors).toContain(expectedError);
+      expect(response.body.errors).toContain('Name is required');
+    });
+
+    it('should return 400 when name is empty string', async () => {
+      const response = await factory.app
+        .post('/projects')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: '',
+          description: 'This is a test project description'
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('status', 'error');
+      expect(response.body).toHaveProperty('message', 'Validation error');
+      expect(response.body.errors).toContain('Name is required');
+    });
+
+    it('should return 400 when name is not a string', async () => {
+      const response = await factory.app
+        .post('/projects')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 12_345,
+          description: 'This is a test project description'
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('status', 'error');
+      expect(response.body).toHaveProperty('message', 'Validation error');
+      expect(response.body.errors).toContain('Name must be a string');
+    });
+
+    it('should return 400 when description is not a string', async () => {
+      const response = await factory.app
+        .post('/projects')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Test Project',
+          description: 12_345
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('status', 'error');
+      expect(response.body).toHaveProperty('message', 'Validation error');
+      expect(response.body.errors).toContain('Description must be a string');
     });
   });
 
