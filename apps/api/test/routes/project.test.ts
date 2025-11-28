@@ -3,7 +3,7 @@ import { TestFactory } from '../factory';
 import { createTestUser } from '../utils/helper-function';
 
 import type { UserEntity } from '../../src/entities';
-import type { AuthenticatedUser } from '../../src/types/authenticateUser';
+import type { AuthenticatedUser } from '../../src/types';
 
 describe('POST /projects', () => {
   const factory: TestFactory = new TestFactory();

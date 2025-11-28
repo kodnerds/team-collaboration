@@ -1,6 +1,7 @@
 import { ProjectRepository, UserRepository } from '../repository';
 import { HTTP_STATUS } from '../utils/const';
 import { paginationParams } from '../utils/pagination';
+import logger from '../utils/logger';
 
 import type { Request, Response } from 'express';
 
@@ -31,7 +32,8 @@ export const createProject = async (req: Request, res: Response) => {
         }
       }
     });
-  } catch {
+  } catch (error) {
+    logger.error(error);
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
   }
 };
@@ -71,7 +73,8 @@ export const getAllProjects = async (req: Request, res: Response) => {
         }
       }
     });
-  } catch {
+  } catch (error) {
+    logger.error(error);
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
   }
 };
