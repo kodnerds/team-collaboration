@@ -1,7 +1,7 @@
 import { ProjectRepository, UserRepository } from '../repository';
 import { HTTP_STATUS } from '../utils/const';
-import { paginationParams } from '../utils/pagination';
 import logger from '../utils/logger';
+import { paginationParams } from '../utils/pagination';
 
 import type { Request, Response } from 'express';
 
