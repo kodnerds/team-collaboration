@@ -1,5 +1,6 @@
 import { ProjectRepository, UserRepository } from '../repository';
 import { HTTP_STATUS } from '../utils/const';
+import { paginationParams } from '../utils/pagination';
 
 import type { Request, Response } from 'express';
 
@@ -27,6 +28,46 @@ export const createProject = async (req: Request, res: Response) => {
           id: project.createdBy.id,
           name: project.createdBy.name,
           email: project.createdBy.email
+        }
+      }
+    });
+  } catch {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+  }
+};
+
+export const getAllProjects = async (req: Request, res: Response) => {
+  try {
+    const { page: pageNum, limit: limitNum } = paginationParams(req.query);
+    const page = Number(pageNum);
+    const limit = Number(limitNum);
+    const offset = (page - 1) * limit;
+
+    const projectRepository = new ProjectRepository();
+    const projects = await projectRepository.find({
+      skip: offset,
+      take: limit,
+      relations: ['createdBy'],
+      select: {
+        createdBy: {
+          id: true,
+          name: true,
+          email: true
+        }
+      }
+    });
+    const total = await projectRepository.count();
+    const totalPages = Math.ceil(total / limit);
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: 'Projects retrieved successfully',
+      data: {
+        items: projects,
+        meta: {
+          page,
+          limit,
+          total,
+          totalPages
         }
       }
     });

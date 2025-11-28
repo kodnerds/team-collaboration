@@ -79,6 +79,43 @@ describe('POST /projects', () => {
     });
   });
 
+  describe('get projects', () => {
+    it('should return 200 when projects are retrieved successfully', async () => {
+      const response = await factory.app
+        .get('/projects')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Projects retrieved successfully');
+      expect(response.body).toHaveProperty('data');
+      expect(response.body.data).toHaveProperty('items');
+      expect(response.body.data).toHaveProperty('meta');
+      expect(response.body.data.meta).toHaveProperty('page');
+      expect(response.body.data.meta).toHaveProperty('limit');
+      expect(response.body.data.meta).toHaveProperty('total');
+      expect(response.body.data.meta).toHaveProperty('totalPages');
+    });
+
+    it('should return projects with createdBy relation excluding password', async () => {
+      await factory.app.post('/projects').set('Authorization', `Bearer ${authToken}`).send({
+        name: 'Test Project for Relation',
+        description: 'Description'
+      });
+
+      const response = await factory.app
+        .get('/projects')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      const project = response.body.data.items[0];
+      expect(project).toHaveProperty('createdBy');
+      expect(project.createdBy).toHaveProperty('id', testUser.id);
+      expect(project.createdBy).toHaveProperty('name', testUser.name);
+      expect(project.createdBy).toHaveProperty('email', testUser.email);
+      expect(project.createdBy).not.toHaveProperty('password');
+    });
+  });
+
   describe('Validation failures', () => {
     it('should return 400 when name is missing', async () => {
       const response = await factory.app
