@@ -1,16 +1,19 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState(''); 
-  const [password, setPassword] = useState<string | null>(null); 
+  const [password, setPassword] = useState(''); 
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Safe, linear regex for email validation
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  // Enhanced password validation regex
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
   const validate = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -23,8 +26,10 @@ const Login = () => {
 
     if (!password || !password.trim()) {
       newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+    } else if (!passwordRegex.test(password)) {
+      newErrors.password = 'Password must contain uppercase, lowercase, number, and special character';
     }
 
     return newErrors;
@@ -67,7 +72,7 @@ const Login = () => {
         <input
           id="password"
           type="password"
-          value={password ?? ''}
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
           style={{ width: '100%', padding: '8px', marginBottom: '5px', boxSizing: 'border-box' }}
         />
@@ -93,10 +98,12 @@ const Login = () => {
       </form>
 
       <div style={{ marginTop: '15px', textAlign: 'center' }}>
-        <a href="/forgot-password" style={{ marginRight: '10px' }}>
+        <Link to="/forgot-password" style={{ marginRight: '10px', color: '#007bff', textDecoration: 'none' }}>
           Forgot Password?
-        </a>
-        <a href="/signup">Create Account</a>
+        </Link>
+        <Link to="/signup" style={{ color: '#007bff', textDecoration: 'none' }}>
+          Create Account
+        </Link>
       </div>
     </div>
   );
