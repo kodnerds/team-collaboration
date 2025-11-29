@@ -2,6 +2,7 @@ import { TestFactory } from '../factory';
 import { createTestUser } from '../utils/helper-function';
 
 import type { UserEntity } from '../../src/entities';
+import type { PasswordResetEntity } from '../../src/entities/PasswordResetEntity';
 
 describe('POST /auth/login', () => {
   const factory: TestFactory = new TestFactory();
@@ -209,5 +210,68 @@ describe('POST /auth/signup', () => {
     const responseString = JSON.stringify(response.body);
     expect(responseString).not.toContain(password);
     expect(responseString).not.toContain('john@gmail.com');
+  });
+});
+
+describe('POST /auth/forgot-password', () => {
+  const factory: TestFactory = new TestFactory();
+  let testUser: UserEntity;
+
+  beforeAll(async () => {
+    await factory.init();
+  });
+
+  afterAll(async () => {
+    await factory.close();
+  });
+
+  beforeEach(async () => {
+    await factory.reset();
+    testUser = await createTestUser(factory, {
+      name: 'John Doe',
+      email: 'john@gmail.com'
+    });
+  });
+
+  it('should return 200 and create a password reset record when email exists', async () => {
+    const response = await factory.app.post('/auth/forgot-password').send({
+      email: 'john@gmail.com'
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty(
+      'message',
+      'If an account with this email exists, a password reset link has been sent.'
+    );
+
+    const PasswordResetRepository = factory._connection.getRepository('PasswordReset');
+    const resets = await PasswordResetRepository.find({ where: { email: 'john@gmail.com' } });
+
+    expect(resets.length).toBeGreaterThan(0);
+
+    const reset = resets[0];
+    expect(reset).toBeDefined();
+    if (!reset) throw new Error('Expected at least one password reset record');
+
+    expect(reset).toHaveProperty('token');
+    expect(reset.status).toBe('active');
+    expect(new Date(reset.expiresAt).getTime()).toBeGreaterThan(Date.now());
+  });
+
+  it('should return 200 and not create a password reset record when email does not exist', async () => {
+    const response = await factory.app.post('/auth/forgot-password').send({
+      email: 'nonexistent@gmail.com'
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty(
+      'message',
+      'If an account with this email exists, a password reset link has been sent.'
+    );
+
+    const passwordResetRepo = factory._connection.getRepository('PasswordReset');
+    const resets = await passwordResetRepo.find({ where: { email: 'nonexistent@gmail.com' } });
+
+    expect(resets.length).toBe(0);
   });
 });
