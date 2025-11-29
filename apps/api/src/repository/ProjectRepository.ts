@@ -2,7 +2,7 @@ import { connect } from '../database';
 import { ProjectEntity } from '../entities';
 
 import type { UserEntity } from '../entities';
-import type { Repository } from 'typeorm';
+import type { Repository, FindOptionsSelect } from 'typeorm';
 
 export class ProjectRepository {
   private repository: Repository<ProjectEntity>;
@@ -20,7 +20,7 @@ export class ProjectRepository {
     return await this.repository.save(project);
   }
 
-  async find({
+  async findAndCount({
     skip,
     take,
     relations,
@@ -29,9 +29,9 @@ export class ProjectRepository {
     skip: number;
     take: number;
     relations?: string[];
-    select?: object;
-  }): Promise<ProjectEntity[]> {
-    return await this.repository.find({ skip, take, relations, select });
+    select?: FindOptionsSelect<ProjectEntity>;
+  }): Promise<[ProjectEntity[], number]> {
+    return await this.repository.findAndCount({ skip, take, relations, select });
   }
 
   async count(): Promise<number> {

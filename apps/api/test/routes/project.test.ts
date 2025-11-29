@@ -1,6 +1,6 @@
 import { genToken } from '../../src/utils/tokenJWT';
 import { TestFactory } from '../factory';
-import { createTestUser } from '../utils/helper-function';
+import { createTestProject, createTestUser } from '../utils/helper-function';
 
 import type { UserEntity } from '../../src/entities';
 import type { AuthenticatedUser } from '../../src/types';
@@ -79,8 +79,42 @@ describe('POST /projects', () => {
     });
   });
 
-  describe('get projects', () => {
-    it('should return 200 when projects are retrieved successfully', async () => {
+  describe('Get projects endpoint', () => {
+    it('should verify correct pagination (15 projects, page 2, limit 10)', async () => {
+      for (let i = 0; i < 15; i++) {
+        await createTestProject(factory, testUser, {
+          name: `Project ${i + 1}`,
+          description: `Description ${i + 1}`
+        });
+      }
+
+      const response = await factory.app
+        .get('/projects?page=2&limit=10')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.items).toHaveLength(5);
+      expect(response.body.data.meta.page).toBe(2);
+      expect(response.body.data.meta.limit).toBe(10);
+      expect(response.body.data.meta.total).toBe(15);
+      expect(response.body.data.meta.totalPages).toBe(2);
+    });
+
+    it('Should get 401 when trying to get project without authentication', async () => {
+      const response = await factory.app.get('/projects');
+
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
+    });
+
+    it('should retrieve projects successfully, and should verify correct pagination', async () => {
+      for (let i = 0; i < 15; i++) {
+        await createTestProject(factory, testUser, {
+          name: `Project ${i + 1}`,
+          description: `Description ${i + 1}`
+        });
+      }
+
       const response = await factory.app
         .get('/projects')
         .set('Authorization', `Bearer ${authToken}`);
@@ -94,6 +128,19 @@ describe('POST /projects', () => {
       expect(response.body.data.meta).toHaveProperty('limit');
       expect(response.body.data.meta).toHaveProperty('total');
       expect(response.body.data.meta).toHaveProperty('totalPages');
+
+      expect(response.body.data.items).toHaveLength(10);
+      expect(response.body.data.meta.page).toBe(1);
+    });
+
+    it('should handle invalid pagination parameters gracefully', async () => {
+      const response = await factory.app
+        .get('/projects?page=-1&limit=abc')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.meta.page).toBeGreaterThanOrEqual(1);
+      expect(response.body.data.meta.limit).toBeGreaterThan(0);
     });
 
     it('should return projects with createdBy relation excluding password', async () => {

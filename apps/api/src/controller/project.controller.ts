@@ -40,13 +40,10 @@ export const createProject = async (req: Request, res: Response) => {
 
 export const getAllProjects = async (req: Request, res: Response) => {
   try {
-    const { page: pageNum, limit: limitNum } = paginationParams(req.query);
-    const page = Number(pageNum);
-    const limit = Number(limitNum);
-    const offset = (page - 1) * limit;
+    const { page, limit, offset } = paginationParams(req.query);
 
     const projectRepository = new ProjectRepository();
-    const projects = await projectRepository.find({
+    const projects = await projectRepository.findAndCount({
       skip: offset,
       take: limit,
       relations: ['createdBy'],
@@ -58,13 +55,13 @@ export const getAllProjects = async (req: Request, res: Response) => {
         }
       }
     });
-    const total = await projectRepository.count();
+    const total = projects[1];
     const totalPages = Math.ceil(total / limit);
 
     return res.status(HTTP_STATUS.OK).json({
       message: 'Projects retrieved successfully',
       data: {
-        items: projects,
+        items: projects[0],
         meta: {
           page,
           limit,
