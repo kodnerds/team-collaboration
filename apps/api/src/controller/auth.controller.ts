@@ -3,7 +3,7 @@ import { HTTP_STATUS } from '../utils/const';
 import { comparePassword, hashPassword } from '../utils/hashPassword';
 import { genToken } from '../utils/tokenJWT';
 
-import type { AuthenticatedUser } from '../types/authenticateUser';
+import type { AuthenticatedUser } from '../types';
 import type { Request, Response } from 'express';
 
 export const login = async (req: Request, res: Response) => {

@@ -14,6 +14,10 @@ export class UserRepository {
     return await this.repository.findOneBy({ email });
   }
 
+  async findById(id: string): Promise<UserEntity | null> {
+    return await this.repository.findOneBy({ id });
+  }
+
   async create(userData: {
     name: string;
     email: string;
