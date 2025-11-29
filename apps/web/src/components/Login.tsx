@@ -4,8 +4,8 @@ import { useNavigate, Link } from 'react-router-dom';
 const Login = () => {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState(''); 
-  const [password, setPassword] = useState(''); 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,7 +29,8 @@ const Login = () => {
     } else if (password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
     } else if (!passwordRegex.test(password)) {
-      newErrors.password = 'Password must contain uppercase, lowercase, number, and special character';
+      newErrors.password =
+        'Password must contain uppercase, lowercase, number, and special character';
     }
 
     return newErrors;
@@ -98,7 +99,10 @@ const Login = () => {
       </form>
 
       <div style={{ marginTop: '15px', textAlign: 'center' }}>
-        <Link to="/forgot-password" style={{ marginRight: '10px', color: '#007bff', textDecoration: 'none' }}>
+        <Link
+          to="/forgot-password"
+          style={{ marginRight: '10px', color: '#007bff', textDecoration: 'none' }}
+        >
           Forgot Password?
         </Link>
         <Link to="/signup" style={{ color: '#007bff', textDecoration: 'none' }}>
