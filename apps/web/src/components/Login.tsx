@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 // Import the validation function from the shared utility file
-import { validateLoginFields } from '../utils/validation'; 
+import { validateLoginFields } from '../utils/validation';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const Login = () => {
   // *** COMMENTED OUT AND MOVED TO utils/validation.ts ***
   // const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  
+
   // *** REPLACED WITH IMPORTED validateLoginFields ***
   const validate = () => {
     // Calls the shared validation function

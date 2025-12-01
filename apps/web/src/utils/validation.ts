@@ -6,7 +6,10 @@ export const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Z
  * @param password The password string to validate.
  * @returns An object containing validation errors, or an empty object if valid.
  */
-export const validateLoginFields = (email: string, password: string): { email?: string; password?: string } => {
+export const validateLoginFields = (
+  email: string,
+  password: string
+): { email?: string; password?: string } => {
   const newErrors: { email?: string; password?: string } = {};
 
   if (!email.trim()) {
