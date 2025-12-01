@@ -75,3 +75,50 @@ export const getAllProjects = async (req: Request, res: Response) => {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
   }
 };
+
+export const updateProject = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ message: 'Invalid fields provided, Project ID is required' });
+    }
+
+    const { name, description } = req.body;
+
+    const projectRepository = new ProjectRepository();
+    const project = await projectRepository.findOne(id);
+
+    if (!project) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Project ID does not exist' });
+    }
+
+    if (req.user.id !== project?.createdBy.id) {
+      return res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'User is not the project creator' });
+    }
+
+    project.name = name;
+    project.description = description;
+
+    await projectRepository.update(project);
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: 'Project updated successfully',
+      data: {
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        createdBy: {
+          id: project.createdBy.id,
+          name: project.createdBy.name,
+          email: project.createdBy.email
+        }
+      }
+    });
+  } catch (error) {
+    logger.error(error);
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+  }
+};

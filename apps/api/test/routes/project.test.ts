@@ -8,7 +8,10 @@ import type { AuthenticatedUser } from '../../src/types';
 describe('POST /projects', () => {
   const factory: TestFactory = new TestFactory();
   let testUser: UserEntity;
+  let otherUser: UserEntity;
   let authToken: string;
+  let otherAuthToken: string;
+  let projectId: string;
 
   beforeAll(async () => {
     await factory.init();
@@ -25,12 +28,31 @@ describe('POST /projects', () => {
       email: 'john@example.com'
     });
 
+    otherUser = await createTestUser(factory, {
+      name: 'Jane Smith',
+      email: 'jane@example.com'
+    });
+
     const authenticatedUser: AuthenticatedUser = {
       id: testUser.id,
       name: testUser.name,
       email: testUser.email
     };
     authToken = genToken(authenticatedUser);
+
+    const otherAuthenticatedUser: AuthenticatedUser = {
+      id: otherUser.id,
+      name: otherUser.name,
+      email: otherUser.email
+    };
+    otherAuthToken = genToken(otherAuthenticatedUser);
+
+    // Create a project for update tests
+    const project = await createTestProject(factory, testUser, {
+      name: 'Test Project',
+      description: 'This is a test project description'
+    });
+    projectId = project.id;
   });
 
   describe('Successful project creation', () => {
@@ -49,6 +71,8 @@ describe('POST /projects', () => {
       expect(response.body.data).toHaveProperty('id');
       expect(response.body.data).toHaveProperty('name', 'Test Project');
       expect(response.body.data).toHaveProperty('createdBy');
+
+      projectId = response.body.data.id;
     });
 
     it('should save project with a full createdBy relation (not just an ID)', async () => {
@@ -93,10 +117,10 @@ describe('POST /projects', () => {
         .set('Authorization', `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.data.items).toHaveLength(5);
+      expect(response.body.data.items).toHaveLength(6);
       expect(response.body.data.meta.page).toBe(2);
       expect(response.body.data.meta.limit).toBe(10);
-      expect(response.body.data.meta.total).toBe(15);
+      expect(response.body.data.meta.total).toBe(16);
       expect(response.body.data.meta.totalPages).toBe(2);
     });
 
@@ -247,6 +271,61 @@ describe('POST /projects', () => {
 
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('message', 'User is not authorized or token is invalid');
+    });
+  });
+
+  describe('Update project', () => {
+    it('should return 400 when Validation failures', async () => {
+      const response = await factory.app
+        .put(`/projects/${projectId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          description: 12_345
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('status', 'error');
+      expect(response.body).toHaveProperty('message', 'Validation error');
+      expect(response.body.errors).toContain('Description must be a string');
+    });
+
+    it('should return 404 when project ID does not exist', async () => {
+      const response = await factory.app
+        .put(`/projects/2f23cc49-2b8b-4537-9e43-c347f1d08a66`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Test Project',
+          description: 'This is a test project description'
+        });
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Project ID does not exist');
+    });
+
+    it('should return 403 when user is not the project creator', async () => {
+      const response = await factory.app
+        .put(`/projects/${projectId}`)
+        .set('Authorization', `Bearer ${otherAuthToken}`)
+        .send({
+          name: 'Test Project',
+          description: 'This is a test project description'
+        });
+
+      expect(response.status).toBe(403);
+      expect(response.body).toHaveProperty('message', 'User is not the project creator');
+    });
+
+    it('should return 200 when project is updated successfully by creator', async () => {
+      const response = await factory.app
+        .put(`/projects/${projectId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Test Project',
+          description: 'This is a updated test project description'
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Project updated successfully');
     });
   });
 });
