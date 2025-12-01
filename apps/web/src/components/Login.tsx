@@ -1,26 +1,16 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-// Import the validation function from the shared utility file
+
 import { validateLoginFields } from '../utils/validation';
 
 const Login = () => {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // *** COMMENTED OUT AND MOVED TO utils/validation.ts ***
-  // const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-  // *** REPLACED WITH IMPORTED validateLoginFields ***
-  const validate = () => {
-    // Calls the shared validation function
-    return validateLoginFields(email, password);
-  };
-  // *** END OF MODIFIED BLOCK (Lines +13 to +37 in original) ***
+  const validate = () => validateLoginFields(email, password);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
