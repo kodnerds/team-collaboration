@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+// Import the validation function from the shared utility file
+import { validateLoginFields } from '../utils/validation'; 
 
 const Login = () => {
   const navigate = useNavigate();
@@ -9,32 +11,16 @@ const Login = () => {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Safe, linear regex for email validation
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-  // Enhanced password validation regex
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
+  // *** COMMENTED OUT AND MOVED TO utils/validation.ts ***
+  // const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  
+  // *** REPLACED WITH IMPORTED validateLoginFields ***
   const validate = () => {
-    const newErrors: { email?: string; password?: string } = {};
-
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = 'Enter a valid email address';
-    }
-
-    if (!password || !password.trim()) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    } else if (!passwordRegex.test(password)) {
-      newErrors.password =
-        'Password must contain uppercase, lowercase, number, and special character';
-    }
-
-    return newErrors;
+    // Calls the shared validation function
+    return validateLoginFields(email, password);
   };
+  // *** END OF MODIFIED BLOCK (Lines +13 to +37 in original) ***
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
