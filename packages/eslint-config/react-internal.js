@@ -35,7 +35,8 @@ export const config = [
       // React scope no longer necessary with new JSX transform.
       'react/react-in-jsx-scope': 'off',
       'sonarjs/no-nested-template-literals': 'off',
-      'import/no-absolute-path': 'off'
+      'import/no-absolute-path': 'off',
+      'sonarjs/no-hardcoded-passwords': 'off'
     }
   }
 ];
