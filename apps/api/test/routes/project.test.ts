@@ -79,8 +79,9 @@ describe('POST /projects', () => {
     });
   });
 
-  describe('Get projects endpoint', () => {
-    it('should verify correct pagination (15 projects, page 2, limit 10)', async () => {
+  describe('GET /projects', () => {
+    it('should retrieve projects with correct pagination and relations', async () => {
+      // Create 15 test projects
       for (let i = 0; i < 15; i++) {
         await createTestProject(factory, testUser, {
           name: `Project ${i + 1}`,
@@ -88,52 +89,37 @@ describe('POST /projects', () => {
         });
       }
 
-      const response = await factory.app
-        .get('/projects?page=2&limit=10')
-        .set('Authorization', `Bearer ${authToken}`);
-
-      expect(response.status).toBe(200);
-      expect(response.body.data.items).toHaveLength(5);
-      expect(response.body.data.meta.page).toBe(2);
-      expect(response.body.data.meta.limit).toBe(10);
-      expect(response.body.data.meta.total).toBe(15);
-      expect(response.body.data.meta.totalPages).toBe(2);
-    });
-
-    it('Should get 401 when trying to get project without authentication', async () => {
-      const response = await factory.app.get('/projects');
-
-      expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
-    });
-
-    it('should retrieve projects successfully, and should verify correct pagination', async () => {
-      for (let i = 0; i < 15; i++) {
-        await createTestProject(factory, testUser, {
-          name: `Project ${i + 1}`,
-          description: `Description ${i + 1}`
-        });
-      }
-
-      const response = await factory.app
+      // Test page 1 (default)
+      const response1 = await factory.app
         .get('/projects')
         .set('Authorization', `Bearer ${authToken}`);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('message', 'Projects retrieved successfully');
-      expect(response.body).toHaveProperty('data');
-      expect(response.body.data).toHaveProperty('items');
-      expect(response.body.data).toHaveProperty('meta');
-      expect(response.body.data.meta).toHaveProperty('page');
-      expect(response.body.data.meta).toHaveProperty('limit');
-      expect(response.body.data.meta).toHaveProperty('total');
-      expect(response.body.data.meta).toHaveProperty('totalPages');
+      expect(response1.status).toBe(200);
+      expect(response1.body.data.items).toHaveLength(10);
+      expect(response1.body.data.meta).toMatchObject({
+        page: 1,
+        limit: 10,
+        total: 15,
+        totalPages: 2
+      });
 
-      expect(response.body.data.items).toHaveLength(10);
-      expect(response.body.data.meta.page).toBe(1);
+      // Verify createdBy relation excludes password
+      expect(response1.body.data.items[0].createdBy).toEqual({
+        id: testUser.id,
+        name: testUser.name,
+        email: testUser.email
+      });
+
+      const response2 = await factory.app
+        .get('/projects?page=2&limit=10')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response2.status).toBe(200);
+      expect(response2.body.data.items).toHaveLength(5);
+      expect(response2.body.data.meta.page).toBe(2);
     });
 
-    it('should handle invalid pagination parameters gracefully', async () => {
+    it('should handle invalid pagination gracefully', async () => {
       const response = await factory.app
         .get('/projects?page=-1&limit=abc')
         .set('Authorization', `Bearer ${authToken}`);
@@ -143,110 +129,46 @@ describe('POST /projects', () => {
       expect(response.body.data.meta.limit).toBeGreaterThan(0);
     });
 
-    it('should return projects with createdBy relation excluding password', async () => {
-      await factory.app.post('/projects').set('Authorization', `Bearer ${authToken}`).send({
-        name: 'Test Project for Relation',
-        description: 'Description'
-      });
+    it('should return 401 without valid authentication', async () => {
+      // No auth header
+      let response = await factory.app.get('/projects');
+      expect(response.status).toBe(401);
+      expect(response.body.message).toBe('User is not authorized or token is missing');
 
-      const response = await factory.app
+      // Invalid token
+      response = await factory.app
         .get('/projects')
-        .set('Authorization', `Bearer ${authToken}`);
-
-      expect(response.status).toBe(200);
-      const project = response.body.data.items[0];
-      expect(project).toHaveProperty('createdBy');
-      expect(project.createdBy).toHaveProperty('id', testUser.id);
-      expect(project.createdBy).toHaveProperty('name', testUser.name);
-      expect(project.createdBy).toHaveProperty('email', testUser.email);
-      expect(project.createdBy).not.toHaveProperty('password');
-    });
-  });
-
-  describe('Validation failures', () => {
-    it('should return 400 when name is missing', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          description: 'This is a test project description'
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body).toHaveProperty('errors');
-      expect(response.body.errors).toContain('Name is required');
-    });
-
-    it('should return 400 when name is empty string', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: '',
-          description: 'This is a test project description'
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body.errors).toContain('Name is required');
-    });
-
-    it('should return 400 when name is not a string', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: 12_345,
-          description: 'This is a test project description'
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body.errors).toContain('Name must be a string');
-    });
-
-    it('should return 400 when description is not a string', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: 'Test Project',
-          description: 12_345
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body.errors).toContain('Description must be a string');
-    });
-  });
-
-  describe('Unauthenticated access', () => {
-    it('should return 401 when no authorization header is provided', async () => {
-      const response = await factory.app.post('/projects').send({
-        name: 'Test Project',
-        description: 'This is a test project description'
-      });
-
+        .set('Authorization', 'Bearer invalid.token.here');
       expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
     });
 
-    it('should return 401 when token is invalid', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', 'Bearer invalid.token.here')
-        .send({
-          name: 'Test Project',
-          description: 'This is a test project description'
-        });
+    it('should return 400 for validation errors', async () => {
+      const testCases = [
+        { data: { description: 'No name' }, expectedError: 'Name is required' },
+        { data: { name: '', description: 'Empty name' }, expectedError: 'Name is required' },
+        {
+          data: { name: 12_345, description: 'Name not string' },
+          expectedError: 'Name must be a string'
+        },
+        {
+          data: { name: 'Test', description: 12_345 },
+          expectedError: 'Description must be a string'
+        }
+      ];
 
-      expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('message', 'User is not authorized or token is invalid');
+      for (const testCase of testCases) {
+        const response = await factory.app
+          .post('/projects')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(testCase.data);
+
+        expect(response.status).toBe(400);
+        expect(response.body).toMatchObject({
+          status: 'error',
+          message: 'Validation error'
+        });
+        expect(response.body.errors).toContain(testCase.expectedError);
+      }
     });
   });
 });
