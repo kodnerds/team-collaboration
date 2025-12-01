@@ -228,4 +228,33 @@ describe('Projects', () => {
       expect(response.body).toHaveProperty('message', 'User is not the project creator');
     });
   });
+
+  describe('Delete project', () => {
+    it('should return 404 when project ID does not exist', async () => {
+      const response = await factory.app
+        .delete(`/projects/2f23cc49-2b8b-4537-9e43-c347f1d08a66`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Project ID does not exist');
+    });
+
+    it('should return 403 when user is not the project creator', async () => {
+      const response = await factory.app
+        .delete(`/projects/${projectId}`)
+        .set('Authorization', `Bearer ${otherAuthToken}`);
+
+      expect(response.status).toBe(403);
+      expect(response.body).toHaveProperty('message', 'User is not the project creator');
+    });
+
+    it('should return 200 when project is deleted successfully by creator', async () => {
+      const response = await factory.app
+        .delete(`/projects/${projectId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Project deleted successfully');
+    });
+  });
 });

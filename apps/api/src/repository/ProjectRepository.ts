@@ -45,4 +45,8 @@ export class ProjectRepository {
   async findOne(id: string): Promise<ProjectEntity | null> {
     return await this.repository.findOne({ where: { id }, relations: ['createdBy'] });
   }
+
+  async delete(project: ProjectEntity): Promise<void> {
+    await this.repository.remove(project);
+  }
 }

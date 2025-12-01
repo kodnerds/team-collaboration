@@ -163,3 +163,33 @@ export const getAllProjects = async (req: Request, res: Response) => {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
   }
 };
+
+export const deleteProject = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ message: 'Invalid fields provided, Project ID is required' });
+    }
+
+    const projectRepository = new ProjectRepository();
+    const project = await projectRepository.findOne(id);
+
+    if (!project) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Project ID does not exist' });
+    }
+
+    if (req.user.id !== project?.createdBy.id) {
+      return res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'User is not the project creator' });
+    }
+
+    await projectRepository.delete(project);
+
+    return res.status(HTTP_STATUS.OK).json({ message: 'Project deleted successfully' });
+  } catch (error) {
+    logger.error(error);
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+  }
+};
