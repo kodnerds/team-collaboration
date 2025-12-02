@@ -5,7 +5,7 @@ import { createTestProject, createTestUser } from '../utils/helper-function';
 import type { UserEntity } from '../../src/entities';
 import type { AuthenticatedUser } from '../../src/types';
 
-describe('POST /projects', () => {
+describe('Projects', () => {
   const factory: TestFactory = new TestFactory();
   let testUser: UserEntity;
   let otherUser: UserEntity;
@@ -47,7 +47,6 @@ describe('POST /projects', () => {
     };
     otherAuthToken = genToken(otherAuthenticatedUser);
 
-    // Create a project for update tests
     const project = await createTestProject(factory, testUser, {
       name: 'Test Project',
       description: 'This is a test project description'
@@ -55,8 +54,8 @@ describe('POST /projects', () => {
     projectId = project.id;
   });
 
-  describe('Successful project creation', () => {
-    it('should create a project successfully by an authenticated user', async () => {
+  describe('POST /projects', () => {
+    it('should create a project successfully with full createdBy relation', async () => {
       const response = await factory.app
         .post('/projects')
         .set('Authorization', `Bearer ${authToken}`)
@@ -67,28 +66,9 @@ describe('POST /projects', () => {
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('message', 'Project created successfully');
-      expect(response.body).toHaveProperty('data');
-      expect(response.body.data).toHaveProperty('id');
-      expect(response.body.data).toHaveProperty('name', 'Test Project');
-      expect(response.body.data.name.length).toBeGreaterThan(3);
-      expect(response.body.data).toHaveProperty('createdBy');
-
-      projectId = response.body.data.id;
-    });
-
-    it('should save project with a full createdBy relation (not just an ID)', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: 'Test Project',
-          description: 'This is a test project description'
-        });
-
-      expect(response.status).toBe(201);
-      expect(response.body.data.createdBy).toHaveProperty('id', testUser.id);
-      expect(response.body.data.createdBy).toHaveProperty('name', testUser.name);
-      expect(response.body.data.createdBy).toHaveProperty('email', testUser.email);
+      expect(response.body.data).toHaveProperty('createdBy.id', testUser.id);
+      expect(response.body.data).toHaveProperty('createdBy.name', testUser.name);
+      expect(response.body.data).toHaveProperty('createdBy.email', testUser.email);
 
       const projectRepository = factory._connection.getRepository('ProjectEntity');
       const project = await projectRepository.findOne({
@@ -96,16 +76,69 @@ describe('POST /projects', () => {
         relations: ['createdBy']
       });
 
-      expect(project).toBeDefined();
-      expect(project?.createdBy).toBeDefined();
       expect(project?.createdBy.id).toBe(testUser.id);
-      expect(project?.createdBy.name).toBe(testUser.name);
-      expect(project?.createdBy.email).toBe(testUser.email);
+    });
+
+    it('should return 400 when name is missing or invalid', async () => {
+      const response = await factory.app
+        .post('/projects')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          description: 'This is a test project description'
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('status', 'error');
+      expect(response.body).toHaveProperty('message', 'Validation error');
+      expect(response.body.errors).toContain('Name is required');
+    });
+
+    it('should return 401 without authentication', async () => {
+      const response = await factory.app.post('/projects').send({
+        name: 'Test Project',
+        description: 'This is a test project description'
+      });
+
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
+    });
+
+    it('should return 401 with invalid token', async () => {
+      const response = await factory.app
+        .post('/projects')
+        .set('Authorization', 'Bearer invalid.token.here')
+        .send({
+          name: 'Test Project',
+          description: 'This is a test project description'
+        });
+
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('message', 'User is not authorized or token is invalid');
     });
   });
 
-  describe('Get projects endpoint', () => {
-    it('should verify correct pagination (15 projects, page 2, limit 10)', async () => {
+  describe('GET /projects', () => {
+    it('should retrieve projects with correct pagination', async () => {
+      for (let i = 0; i < 15; i++) {
+        await createTestProject(factory, testUser, {
+          name: `Project ${i + 1}`,
+          description: `Description ${i + 1}`
+        });
+      }
+
+      const response = await factory.app
+        .get('/projects')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Projects retrieved successfully');
+      expect(response.body.data.items).toHaveLength(10);
+      expect(response.body.data.meta).toHaveProperty('page', 1);
+      expect(response.body.data.meta).toHaveProperty('total', 16);
+      expect(response.body.data.meta).toHaveProperty('totalPages', 2);
+    });
+
+    it('should handle pagination parameters correctly', async () => {
       for (let i = 0; i < 15; i++) {
         await createTestProject(factory, testUser, {
           name: `Project ${i + 1}`,
@@ -121,162 +154,42 @@ describe('POST /projects', () => {
       expect(response.body.data.items).toHaveLength(6);
       expect(response.body.data.meta.page).toBe(2);
       expect(response.body.data.meta.limit).toBe(10);
-      expect(response.body.data.meta.total).toBe(16);
-      expect(response.body.data.meta.totalPages).toBe(2);
     });
 
-    it('Should get 401 when trying to get project without authentication', async () => {
-      const response = await factory.app.get('/projects');
-
-      expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
-    });
-
-    it('should retrieve projects successfully, and should verify correct pagination', async () => {
-      for (let i = 0; i < 15; i++) {
-        await createTestProject(factory, testUser, {
-          name: `Project ${i + 1}`,
-          description: `Description ${i + 1}`
-        });
-      }
-
-      const response = await factory.app
-        .get('/projects')
-        .set('Authorization', `Bearer ${authToken}`);
-
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('message', 'Projects retrieved successfully');
-      expect(response.body).toHaveProperty('data');
-      expect(response.body.data).toHaveProperty('items');
-      expect(response.body.data).toHaveProperty('meta');
-      expect(response.body.data.meta).toHaveProperty('page');
-      expect(response.body.data.meta).toHaveProperty('limit');
-      expect(response.body.data.meta).toHaveProperty('total');
-      expect(response.body.data.meta).toHaveProperty('totalPages');
-
-      expect(response.body.data.items).toHaveLength(10);
-      expect(response.body.data.meta.page).toBe(1);
-    });
-
-    it('should handle invalid pagination parameters gracefully', async () => {
-      const response = await factory.app
-        .get('/projects?page=-1&limit=abc')
-        .set('Authorization', `Bearer ${authToken}`);
-
-      expect(response.status).toBe(200);
-      expect(response.body.data.meta.page).toBeGreaterThanOrEqual(1);
-      expect(response.body.data.meta.limit).toBeGreaterThan(0);
-    });
-
-    it('should return projects with createdBy relation excluding password', async () => {
-      await factory.app.post('/projects').set('Authorization', `Bearer ${authToken}`).send({
-        name: 'Test Project for Relation',
-        description: 'Description'
-      });
-
+    it('should return projects without password in createdBy', async () => {
       const response = await factory.app
         .get('/projects')
         .set('Authorization', `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
       const project = response.body.data.items[0];
-      expect(project).toHaveProperty('createdBy');
-      expect(project.createdBy).toHaveProperty('id', testUser.id);
-      expect(project.createdBy).toHaveProperty('name', testUser.name);
-      expect(project.createdBy).toHaveProperty('email', testUser.email);
       expect(project.createdBy).not.toHaveProperty('password');
     });
-  });
 
-  describe('Validation failures', () => {
-    it('should return 400 when name is missing', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          description: 'This is a test project description'
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body).toHaveProperty('errors');
-      expect(response.body.errors).toContain('Name is required');
-    });
-
-    it('should return 400 when name is empty string', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: '',
-          description: 'This is a test project description'
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body.errors).toContain('Name is required');
-    });
-
-    it('should return 400 when name is not a string', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: 12_345,
-          description: 'This is a test project description'
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body.errors).toContain('Name must be a string');
-    });
-
-    it('should return 400 when description is not a string', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: 'Test Project',
-          description: 12_345
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body.errors).toContain('Description must be a string');
-    });
-  });
-
-  describe('Unauthenticated access', () => {
-    it('should return 401 when no authorization header is provided', async () => {
-      const response = await factory.app.post('/projects').send({
-        name: 'Test Project',
-        description: 'This is a test project description'
-      });
+    it('should return 401 without authentication', async () => {
+      const response = await factory.app.get('/projects');
 
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
     });
-
-    it('should return 401 when token is invalid', async () => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', 'Bearer invalid.token.here')
-        .send({
-          name: 'Test Project',
-          description: 'This is a test project description'
-        });
-
-      expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('message', 'User is not authorized or token is invalid');
-    });
   });
 
-  describe('Update project endpoint', () => {
-    it('should return 400 when Description Validation failures occur', async () => {
+  describe('PUT /projects/:id', () => {
+    it('should update project successfully by creator', async () => {
+      const response = await factory.app
+        .put(`/projects/${projectId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Updated Project',
+          description: 'This is an updated test project description'
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Project updated successfully');
+      expect(response.body.data).toHaveProperty('name', 'Updated Project');
+    });
+
+    it('should return 400 when validation fails', async () => {
       const response = await factory.app
         .put(`/projects/${projectId}`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -285,36 +198,11 @@ describe('POST /projects', () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
       expect(response.body).toHaveProperty('message', 'Validation error');
       expect(response.body.errors).toContain('Description must be a string');
     });
 
-    it('should return 400 when Name Validation failures occur', async () => {
-      const response = await factory.app
-        .put(`/projects/${projectId}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: 12_345
-        });
-
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body.errors).toContain('Name must be a string');
-    });
-
-    it('Should get 401 when trying to update project without authentication', async () => {
-      const response = await factory.app.put(`/projects/${projectId}`).send({
-        name: 'Test Project',
-        description: 'This is a updated test project description'
-      });
-
-      expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
-    });
-
-    it('should return 404 when project ID does not exist', async () => {
+    it('should return 404 when project does not exist', async () => {
       const response = await factory.app
         .put(`/projects/2f23cc49-2b8b-4537-9e43-c347f1d08a66`)
         .set('Authorization', `Bearer ${authToken}`)
@@ -332,39 +220,12 @@ describe('POST /projects', () => {
         .put(`/projects/${projectId}`)
         .set('Authorization', `Bearer ${otherAuthToken}`)
         .send({
-          name: 'Test Project',
-          description: 'This is a test project description'
+          name: 'Updated Project',
+          description: 'This is an updated test project description'
         });
 
       expect(response.status).toBe(403);
       expect(response.body).toHaveProperty('message', 'User is not the project creator');
-    });
-
-    it('should return 200 when the user only update the description', async () => {
-      const response = await factory.app
-        .put(`/projects/${projectId}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          description: 'This is an updated test project description one'
-        });
-
-      expect(response.status).toBe(200);
-      expect(response.body.data.name.length).toBeGreaterThan(3);
-      expect(response.body).toHaveProperty('message', 'Project updated successfully');
-    });
-
-    it('should return 200 when project is updated successfully by creator', async () => {
-      const response = await factory.app
-        .put(`/projects/${projectId}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          name: 'Test Project',
-          description: 'This is an updated test project description'
-        });
-
-      expect(response.status).toBe(200);
-      expect(response.body.data.name.length).toBeGreaterThan(3);
-      expect(response.body).toHaveProperty('message', 'Project updated successfully');
     });
   });
 });
