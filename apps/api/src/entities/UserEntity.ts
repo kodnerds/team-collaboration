@@ -2,9 +2,12 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn
 } from 'typeorm';
+
+import { TaskEntity } from './TaskEntity';
 
 @Entity({ name: 'user' })
 export class UserEntity {
@@ -22,6 +25,9 @@ export class UserEntity {
 
   @Column({ nullable: true })
   avatarUrl?: string;
+
+  @OneToMany(() => TaskEntity, (task) => task.createdBy)
+  tasks: TaskEntity[];
 
   @CreateDateColumn()
   createdAt: Date;
