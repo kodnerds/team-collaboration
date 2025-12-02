@@ -9,7 +9,7 @@ import logger from './utils/logger';
 
 const PORT = envConfig.PORT || 3001;
 
-const main = async () => {
+const main = async () =>   {
   const app = express();
 
   app.use(helmet());
