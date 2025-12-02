@@ -95,12 +95,16 @@ export const updateProject = async (req: Request, res: Response) => {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Project ID does not exist' });
     }
 
-    if (req.user.id !== project?.createdBy.id) {
+    if (req.user.id !== project.createdBy.id) {
       return res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'User is not the project creator' });
     }
 
-    project.name = name;
-    project.description = description;
+    if (name !== undefined) {
+      project.name = name;
+    }
+    if (description !== undefined) {
+      project.description = description;
+    }
 
     await projectRepository.update(project);
 
