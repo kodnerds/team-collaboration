@@ -17,15 +17,14 @@ export const createTask = async (req: Request, res: Response) => {
     const userRepository = new UserRepository();
     const taskRepository = new TaskRepository();
 
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     const project = await projectRepository.findOne({ where: { id: projectId } });
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
-    }
-
-    const user = await userRepository.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
     }
 
     const newTask = await taskRepository.create({
