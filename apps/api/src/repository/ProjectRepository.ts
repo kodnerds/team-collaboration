@@ -37,4 +37,8 @@ export class ProjectRepository {
   async count(): Promise<number> {
     return await this.repository.count();
   }
+
+  async findById(id: string): Promise<ProjectEntity | null> {
+    return await this.repository.findOne({ where: { id }, relations: ['createdBy'] });
+  }
 }
