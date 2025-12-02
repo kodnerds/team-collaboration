@@ -20,7 +20,7 @@ const main = async () => {
   app.use(urlencoded({ extended: true }));
 
   app.get('/', (_, res) => {
-    res.send({ message: 'Welcome to the Jobboard API!' });
+    res.send({ message: 'Welcome to the TC API!' });
   });
 
   app.use('/api/v1', routes);

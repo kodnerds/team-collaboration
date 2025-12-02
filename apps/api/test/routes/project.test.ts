@@ -229,7 +229,7 @@ describe('Projects', () => {
     });
   });
 
-  describe('Delete project', () => {
+  describe('DELETE /projects/:id', () => {
     it('should return 404 when project ID does not exist', async () => {
       const response = await factory.app
         .delete(`/projects/2f23cc49-2b8b-4537-9e43-c347f1d08a66`)
