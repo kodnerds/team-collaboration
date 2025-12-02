@@ -2,7 +2,7 @@ import { connect } from '../database';
 import { ProjectEntity } from '../entities';
 
 import type { UserEntity } from '../entities';
-import type { Repository } from 'typeorm';
+import type { FindOneOptions, Repository } from 'typeorm';
 
 export class ProjectRepository {
   private repository: Repository<ProjectEntity>;
@@ -18,5 +18,9 @@ export class ProjectRepository {
   }): Promise<ProjectEntity> {
     const project = this.repository.create(projectData);
     return await this.repository.save(project);
+  }
+
+  async findOne(options: FindOneOptions<ProjectEntity>): Promise<ProjectEntity | null> {
+    return await this.repository.findOne(options);
   }
 }
