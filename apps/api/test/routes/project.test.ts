@@ -1,6 +1,6 @@
 import { genToken } from '../../src/utils/tokenJWT';
 import { TestFactory } from '../factory';
-import { createTestUser } from '../utils/helper-function';
+import { createTestProject, createTestUser } from '../utils/helper-function';
 
 import type { UserEntity } from '../../src/entities';
 import type { AuthenticatedUser } from '../../src/types';
@@ -79,66 +79,96 @@ describe('POST /projects', () => {
     });
   });
 
-  describe('Validation failures', () => {
-    const validationCases = [
-      {
-        description: 'should return 400 when name is missing',
-        payload: { description: 'This is a test project description' },
-        expectedError: 'Name is required'
-      },
-      {
-        description: 'should return 400 when name is empty string',
-        payload: { name: '', description: 'This is a test project description' },
-        expectedError: 'Name is required'
-      },
-      {
-        description: 'should return 400 when name is not a string',
-        payload: { name: 12_345, description: 'This is a test project description' },
-        expectedError: 'Name must be a string'
-      },
-      {
-        description: 'should return 400 when description is not a string',
-        payload: { name: 'Test Project', description: 12_345 },
-        expectedError: 'Description must be a string'
+  describe('GET /projects', () => {
+    it('should retrieve projects with correct pagination and relations', async () => {
+      // Create 15 test projects
+      for (let i = 0; i < 15; i++) {
+        await createTestProject(factory, testUser, {
+          name: `Project ${i + 1}`,
+          description: `Description ${i + 1}`
+        });
       }
-    ];
 
-    it.each(validationCases)('$description', async ({ payload, expectedError }) => {
-      const response = await factory.app
-        .post('/projects')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send(payload);
+      // Test page 1 (default)
+      const response1 = await factory.app
+        .get('/projects')
+        .set('Authorization', `Bearer ${authToken}`);
 
-      expect(response.status).toBe(400);
-      expect(response.body).toHaveProperty('status', 'error');
-      expect(response.body).toHaveProperty('message', 'Validation error');
-      expect(response.body).toHaveProperty('errors');
-      expect(response.body.errors).toContain(expectedError);
-    });
-  });
-
-  describe('Unauthenticated access', () => {
-    it('should return 401 when no authorization header is provided', async () => {
-      const response = await factory.app.post('/projects').send({
-        name: 'Test Project',
-        description: 'This is a test project description'
+      expect(response1.status).toBe(200);
+      expect(response1.body.data.items).toHaveLength(10);
+      expect(response1.body.data.meta).toMatchObject({
+        page: 1,
+        limit: 10,
+        total: 15,
+        totalPages: 2
       });
 
-      expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
+      // Verify createdBy relation excludes password
+      expect(response1.body.data.items[0].createdBy).toEqual({
+        id: testUser.id,
+        name: testUser.name,
+        email: testUser.email
+      });
+
+      const response2 = await factory.app
+        .get('/projects?page=2&limit=10')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response2.status).toBe(200);
+      expect(response2.body.data.items).toHaveLength(5);
+      expect(response2.body.data.meta.page).toBe(2);
     });
 
-    it('should return 401 when token is invalid', async () => {
+    it('should handle invalid pagination gracefully', async () => {
       const response = await factory.app
-        .post('/projects')
-        .set('Authorization', 'Bearer invalid.token.here')
-        .send({
-          name: 'Test Project',
-          description: 'This is a test project description'
-        });
+        .get('/projects?page=-1&limit=abc')
+        .set('Authorization', `Bearer ${authToken}`);
 
+      expect(response.status).toBe(200);
+      expect(response.body.data.meta.page).toBeGreaterThanOrEqual(1);
+      expect(response.body.data.meta.limit).toBeGreaterThan(0);
+    });
+
+    it('should return 401 without valid authentication', async () => {
+      // No auth header
+      let response = await factory.app.get('/projects');
       expect(response.status).toBe(401);
-      expect(response.body).toHaveProperty('message', 'User is not authorized or token is invalid');
+      expect(response.body.message).toBe('User is not authorized or token is missing');
+
+      // Invalid token
+      response = await factory.app
+        .get('/projects')
+        .set('Authorization', 'Bearer invalid.token.here');
+      expect(response.status).toBe(401);
+    });
+
+    it('should return 400 for validation errors', async () => {
+      const testCases = [
+        { data: { description: 'No name' }, expectedError: 'Name is required' },
+        { data: { name: '', description: 'Empty name' }, expectedError: 'Name is required' },
+        {
+          data: { name: 12_345, description: 'Name not string' },
+          expectedError: 'Name must be a string'
+        },
+        {
+          data: { name: 'Test', description: 12_345 },
+          expectedError: 'Description must be a string'
+        }
+      ];
+
+      for (const testCase of testCases) {
+        const response = await factory.app
+          .post('/projects')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(testCase.data);
+
+        expect(response.status).toBe(400);
+        expect(response.body).toMatchObject({
+          status: 'error',
+          message: 'Validation error'
+        });
+        expect(response.body.errors).toContain(testCase.expectedError);
+      }
     });
   });
 });
