@@ -83,22 +83,14 @@ finally {
 
         <button
           type="submit"
-          style={{
-            width: '100%',
-            padding: '10px',
-            marginTop: '20px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer'
-          }}
+          className="w-full py-2.5 mt-5 bg-blue-500 text-white rounded hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Logging in...' : 'Login'}
         </button>
       </form>
 
-      <div style={{ marginTop: '15px', textAlign: 'center' }}>
+      <div className='text-center mt-5'>
         <Link
           to="/forgot-password"
           className='mr-4 text-blue-700 no-underline hover:underline'
