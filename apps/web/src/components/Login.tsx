@@ -35,17 +35,18 @@ const Login = () => {
 
       // Redirect to dashboard
       navigate("/dashboard");
-    } catch (err: any) {
-  if (err.status === 400) {
-    setErrors({ email: "Invalid input — check your fields" });
-  } else if (err.status === 401) {
-    // Attach auth errors to password — common UX practice
-    setErrors({ password: err.message || "Incorrect email or password" });
-  } else {
-    setErrors({ password: "Something went wrong. Try again." });
-  }
-}
-finally {
+    } 
+    catch (err: any) {
+    if (err.status === 400) {
+      setErrors({ email: "Invalid input — check your fields" });
+    } else if (err.status === 401) {
+      // Attach auth errors to password — common UX practice
+      setErrors({ password: err.message || "Incorrect email or password" });
+    } else {
+      setErrors({ password: "Something went wrong. Try again." });
+    }
+   }
+   finally {
       setIsSubmitting(false);
     }
   };
@@ -66,7 +67,7 @@ finally {
           onChange={(e) => setEmail(e.target.value)}
           className="w-full px-3 py-2.5 mb-3 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-sm"
         />
-        {errors.email && <div style={{ color: 'red', marginBottom: '10px' }}>{errors.email}</div>}
+        {errors.email && <div className='text-red-500 mb-2.5'>{errors.email}</div>}
 
         <label htmlFor="password"
         className='block text-sm font-semibold text-gray-700 mt-3 mb-2'>Password</label>
@@ -75,10 +76,10 @@ finally {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2.5 mb-3 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-black text-lg"
+          className="w-full px-3 py-2.5 mb-3 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-gray-900 text-sm"
         />
         {errors.password && (
-          <div style={{ color: 'red', marginBottom: '10px' }}>{errors.password}</div>
+          <div className='text-red-500 mb-2.5'>{errors.password}</div>
         )}
 
         <button
