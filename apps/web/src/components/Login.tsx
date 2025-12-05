@@ -75,7 +75,7 @@ finally {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2.5 mb-3 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-sm"
+          className="w-full px-3 py-2.5 mb-3 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-black text-lg"
         />
         {errors.password && (
           <div style={{ color: 'red', marginBottom: '10px' }}>{errors.password}</div>
