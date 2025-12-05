@@ -59,3 +59,56 @@ export const createTask = async (req: Request, res: Response) => {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
   }
 };
+
+export const updateTask = async (req: Request, res: Response) => {
+  try {
+    const { taskId } = req.params;
+    const { title, description, status } = req.body;
+    const { id: userId } = req.user;
+
+    if (!taskId) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'Task ID is required' });
+    }
+
+    const userRepository = new UserRepository();
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: 'User not found' });
+    }
+
+    const taskRepository = new TaskRepository();
+    const task = await taskRepository.findOne(taskId);
+
+    if (!task) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found' });
+    }
+
+    const updatedTask = await taskRepository.update({
+      id: taskId,
+      title,
+      description,
+      status
+    });
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: 'Task updated successfully',
+      data: {
+        id: updatedTask.id,
+        title: updatedTask.title,
+        description: updatedTask.description,
+        status: updatedTask.status,
+        createdBy: {
+          id: user.id,
+          name: user.name,
+          email: user.email
+        },
+        createdAt: updatedTask.createdAt,
+        updatedAt: updatedTask.updatedAt
+      }
+    });
+  } catch (error) {
+    logger.error(error);
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+  }
+};
