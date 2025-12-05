@@ -27,5 +27,6 @@ router.delete('/:id', authenticate, deleteProject);
 router.get('/:id', authenticate, getSingleProject);
 router.post('/:projectId/tasks', authenticate, taskValidator, validate, createTask);
 router.patch('/:projectId/tasks/:taskId', authenticate, taskUpdateValidator, validate, updateTask);
+router.patch('/:taskId/tasks', authenticate, taskUpdateValidator, validate, updateTask);
 
 export default router;
