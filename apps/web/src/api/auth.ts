@@ -1,8 +1,12 @@
+interface HttpError extends Error {
+  status: number;
+}
+
 export const loginUser = async (email: string, password: string) => {
   // Validate inputs
   if (!email || !password) {
-    const error = new Error('Email and password are required');
-    (error as any).status = 400;
+    const error = new Error('Email and password are required') as HttpError;
+    error.status = 400;
     throw error;
   }
 
@@ -18,8 +22,8 @@ export const loginUser = async (email: string, password: string) => {
   // If response is not ok, throw error for catch block
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const error = new Error(errorData?.message || 'Something went wrong');
-    (error as any).status = response.status;
+    const error = new Error(errorData?.message || 'Something went wrong') as HttpError;
+    error.status = response.status;
     throw error;
   }
 
