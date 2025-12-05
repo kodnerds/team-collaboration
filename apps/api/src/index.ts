@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import cors from 'cors';
 import express, { urlencoded, json } from 'express';
 import helmet from 'helmet';
 
@@ -11,6 +12,13 @@ const PORT = envConfig.PORT || 3001;
 
 const main = async () => {
   const app = express();
+
+  app.use(
+    cors({
+      origin: true,
+      credentials: true
+    })
+  );
 
   app.use(helmet());
 

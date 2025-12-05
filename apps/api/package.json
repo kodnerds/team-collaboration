@@ -6,6 +6,7 @@
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.1",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-validator": "^7.3.1",
@@ -20,6 +21,7 @@
     "@tc/eslint-config": "*",
     "@tc/typescript-config": "*",
     "@testcontainers/postgresql": "^11.8.1",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/helmet": "^0.0.48",
     "@types/jest": "^30.0.0",
