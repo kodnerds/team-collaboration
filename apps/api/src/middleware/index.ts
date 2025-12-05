@@ -1,2 +1,2 @@
-export * from './authentications';
+export * from './validators';
 export * from './userAuth/authenticate';
