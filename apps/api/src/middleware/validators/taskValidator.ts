@@ -14,3 +14,12 @@ export const taskValidator = [
     .isIn(Object.values(TaskStatus))
     .withMessage('Status must be one of: ' + Object.values(TaskStatus).join(', '))
 ];
+
+export const taskUpdateValidator = [
+  body('title').optional().isString().withMessage('Title must be a string'),
+  body('description').optional().isString().withMessage('Description must be a string'),
+  body('status')
+    .optional()
+    .isIn(Object.values(TaskStatus))
+    .withMessage('Status must be one of: ' + Object.values(TaskStatus).join(', '))
+];
