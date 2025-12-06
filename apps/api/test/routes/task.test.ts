@@ -130,10 +130,10 @@ describe('Tasks', () => {
     });
   });
 
-  describe('PATCH /projects/:taskId/tasks', () => {
+  describe('PATCH /projects/:projectId/tasks/:taskId', () => {
     it('should update a task successfully', async () => {
       const response = await factory.app
-        .patch(`/projects/${taskId}/tasks`)
+        .patch(`/projects/${projectId}/tasks/${taskId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           title: 'Updated Task',
@@ -153,7 +153,7 @@ describe('Tasks', () => {
     it('should return 404 when task not found', async () => {
       const nonExistentTaskId = '2f23cc49-2b8b-4537-9e43-c347f1d08a66';
       const response = await factory.app
-        .patch(`/projects/${nonExistentTaskId}/tasks`)
+        .patch(`/projects/${projectId}/tasks/${nonExistentTaskId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           title: 'Updated Task'
@@ -163,8 +163,46 @@ describe('Tasks', () => {
       expect(response.body).toHaveProperty('message', 'Task not found');
     });
 
+    it('should return 404 when task is not in the project', async () => {
+      const otherProject = await createTestProject(factory, testUser, {
+        name: 'Other Project'
+      });
+
+      const response = await factory.app
+        .patch(`/projects/${otherProject.id}/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          title: 'Updated Task'
+        });
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Task not found in this project');
+    });
+
+    it('should return 403 when user is not the project creator', async () => {
+      const otherUser = await createTestUser(factory, {
+        name: 'Jane Doe',
+        email: 'jane@example.com'
+      });
+      const otherUserToken = genToken({
+        id: otherUser.id,
+        name: otherUser.name,
+        email: otherUser.email
+      });
+
+      const response = await factory.app
+        .patch(`/projects/${projectId}/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${otherUserToken}`)
+        .send({
+          title: 'Updated Task'
+        });
+
+      expect(response.status).toBe(403);
+      expect(response.body).toHaveProperty('message', 'You are not authorized to update this task');
+    });
+
     it('should return 401 when unauthenticated', async () => {
-      const response = await factory.app.patch(`/projects/${taskId}/tasks`).send({
+      const response = await factory.app.patch(`/projects/${projectId}/tasks/${taskId}`).send({
         title: 'Updated Task'
       });
       expect(response.status).toBe(401);
@@ -173,7 +211,7 @@ describe('Tasks', () => {
 
     it('should return 400 when status is invalid', async () => {
       const response = await factory.app
-        .patch(`/projects/${taskId}/tasks`)
+        .patch(`/projects/${projectId}/tasks/${taskId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           title: 'Updated Task',

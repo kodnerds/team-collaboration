@@ -62,12 +62,14 @@ export const createTask = async (req: Request, res: Response) => {
 
 export const updateTask = async (req: Request, res: Response) => {
   try {
-    const { taskId } = req.params;
+    const { taskId, projectId } = req.params;
     const { title, description, status } = req.body;
     const { id: userId } = req.user;
 
-    if (!taskId) {
-      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'Task ID is required' });
+    if (!taskId || !projectId) {
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ message: 'Task ID and Project ID are required' });
     }
 
     const userRepository = new UserRepository();
@@ -82,6 +84,16 @@ export const updateTask = async (req: Request, res: Response) => {
 
     if (!task) {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found' });
+    }
+
+    if (task.project.id !== projectId) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found in this project' });
+    }
+
+    if (task.project.createdBy.id !== userId) {
+      return res
+        .status(HTTP_STATUS.FORBIDDEN)
+        .json({ message: 'You are not authorized to update this task' });
     }
 
     const updatedTask = await taskRepository.update({
@@ -99,9 +111,9 @@ export const updateTask = async (req: Request, res: Response) => {
         description: updatedTask.description,
         status: updatedTask.status,
         createdBy: {
-          id: user.id,
-          name: user.name,
-          email: user.email
+          id: updatedTask.createdBy.id,
+          name: updatedTask.createdBy.name,
+          email: updatedTask.createdBy.email
         },
         createdAt: updatedTask.createdAt,
         updatedAt: updatedTask.updatedAt

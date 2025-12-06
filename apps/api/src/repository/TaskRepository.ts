@@ -25,12 +25,12 @@ export class TaskRepository {
   async findOne(id: string): Promise<TaskEntity | null> {
     return await this.repository.findOne({
       where: { id },
-      relations: ['project', 'createdBy']
+      relations: ['project', 'createdBy', 'project.createdBy']
     });
   }
 
   async update(task: Partial<TaskEntity>): Promise<TaskEntity> {
-    await this.repository.save(task);
+    await this.repository.update(task.id as string, task);
     const updatedTask = await this.findOne(task.id as string);
     if (!updatedTask) {
       throw new Error('Task not found after update');
