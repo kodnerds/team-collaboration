@@ -257,4 +257,44 @@ describe('Projects', () => {
       expect(response.body).toHaveProperty('message', 'Project deleted successfully');
     });
   });
+
+  describe('GET /projects/:id', () => {
+    it('should return 404 when project ID does not exist', async () => {
+      const response = await factory.app
+        .get(`/projects/2f23cc49-2b8b-4537-9e43-c347f1d08a66`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Project ID does not exist');
+    });
+
+    it('should return 200 when project is retrieved successfully', async () => {
+      const response = await factory.app
+        .get(`/projects/${projectId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Project retrieved successfully');
+    });
+
+    it('should return 401 when user is not authenticated', async () => {
+      const response = await factory.app.get(`/projects/${projectId}`);
+
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
+    });
+
+    it('should ensure createdBy relation is included without password', async () => {
+      const response = await factory.app
+        .get(`/projects/${projectId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toHaveProperty('createdBy');
+      expect(response.body.data.createdBy).toHaveProperty('id');
+      expect(response.body.data.createdBy).toHaveProperty('email');
+      expect(response.body.data.createdBy).toHaveProperty('name');
+      expect(response.body.data.createdBy).not.toHaveProperty('password');
+    });
+  });
 });
