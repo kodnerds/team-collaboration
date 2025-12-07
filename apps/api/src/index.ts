@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import cors from 'cors';
 import express, { urlencoded, json } from 'express';
 import helmet from 'helmet';
 
@@ -7,10 +8,17 @@ import { AppDataSource } from './database';
 import routes from './routes';
 import logger from './utils/logger';
 
-const PORT = envConfig.PORT || 3001;
+const PORT = envConfig.PORT || 3000;
 
 const main = async () => {
   const app = express();
+
+  app.use(
+    cors({
+      origin: true,
+      credentials: true
+    })
+  );
 
   app.use(helmet());
 
@@ -20,7 +28,7 @@ const main = async () => {
   app.use(urlencoded({ extended: true }));
 
   app.get('/', (_, res) => {
-    res.send({ message: 'Welcome to the Jobboard API!' });
+    res.send({ message: 'Welcome to the TC API!' });
   });
 
   app.use('/api/v1', routes);

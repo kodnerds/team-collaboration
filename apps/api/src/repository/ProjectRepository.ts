@@ -37,4 +37,16 @@ export class ProjectRepository {
   async count(): Promise<number> {
     return await this.repository.count();
   }
+
+  async update(project: ProjectEntity): Promise<ProjectEntity> {
+    return await this.repository.save(project);
+  }
+
+  async findOne(id: string): Promise<ProjectEntity | null> {
+    return await this.repository.findOne({ where: { id }, relations: ['createdBy'] });
+  }
+
+  async delete(project: ProjectEntity): Promise<void> {
+    await this.repository.remove(project);
+  }
 }
