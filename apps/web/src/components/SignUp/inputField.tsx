@@ -1,6 +1,5 @@
 type InputFieldProps = {
   type: string;
-  id: string;
   htmlFor: string;
   text: string;
   placeholder: string;
@@ -12,7 +11,6 @@ type InputFieldProps = {
 
 const InputField = ({
   type,
-  id,
   htmlFor,
   text,
   placeholder,
@@ -21,21 +19,23 @@ const InputField = ({
   onChange,
   name
 }: InputFieldProps) => (
-  <div className="input-group">
-    <label htmlFor={htmlFor} className="input-label">
+  <div className="input-group ">
+    <label
+      htmlFor={htmlFor}
+      className="input-label block text-sm font-semibold text-gray-700  mb-1"
+    >
       {text}
     </label>
     <input
       value={value}
       onChange={onChange}
       type={type}
-      id={id}
+      id={htmlFor}
       name={name}
-      className="input-field"
+      className="w-full px-3 py-2.5 mb-1 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none bg-white text-black"
       placeholder={placeholder}
     />
-    <p className="errorMsg">{error && <span>{error} </span>}</p>
- 
+    <p className="text-red-500 mb-2.5 errMsg">{error && <span>{error} </span>}</p>
   </div>
 );
 

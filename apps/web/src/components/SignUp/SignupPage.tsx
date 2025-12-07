@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './SignUp.css';
+
+import { validateLoginFields } from '../../utils/validation';
 
 import InputField from './inputField';
 
-const isValidEmail = (email: string) => /^[\w.-]+@[\w.-]+\.[A-Za-z]{2,6}$/.test(email);
 const isValidUrl = (url: string) => {
   if (!url) return true; // Optional field is valid if empty
   try {
@@ -37,6 +37,7 @@ const SignupPage = () => {
   };
 
   // perfoming client side validation
+  const validateSignUp = () => validateLoginFields(formData.email, formData.password);
   const clientSideValidation = () => {
     let isFormValid = true;
 
@@ -45,17 +46,12 @@ const SignupPage = () => {
       setErrors((prev) => ({ ...prev, name: 'Please input a valid name' }));
     }
 
-    if (!formData.email.trim() || !isValidEmail(formData.email)) {
-      isFormValid = false;
-      setErrors((prev) => ({ ...prev, email: 'Email is invalid' }));
+    const validationErrors = validateSignUp();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors((prev) => ({ ...prev, ...validationErrors }));
+      return;
     }
-    if (formData.password.length < 6) {
-      isFormValid = false;
-      setErrors((prev) => ({
-        ...prev,
-        password: 'Password should be at least 6 characters'
-      }));
-    }
+
     if (!isValidUrl(formData.avatar)) {
       isFormValid = false;
       setErrors((prev) => ({ ...prev, avatar: 'Please, input a valid URL' }));
@@ -107,16 +103,17 @@ const SignupPage = () => {
   };
 
   return (
-    <section>
-      <main>
+    <section className="min-h-screen bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4 relative overflow-hidden">
+      <main className="bg-white rounded-lg shadow-xl w-full px-10 py-5  max-w-[450px] relative z-10">
         <Toast message={apiError} duration={3000} />
         <form onSubmit={handleSubmit} className="form-container">
-          <h2>Sign up</h2>
-          <h3>Please enter you details to create a new account</h3>
+          <h2 className="text-3xl text-center font-semibold text-gray-700 mb-2">Sign up</h2>
+          <h3 className="text-center font-semibold text-gray-700 mb-6">
+            Please enter you details to create a new account
+          </h3>
           <InputField
             htmlFor="Name"
-            id="Name"
-            placeholder="John"
+            placeholder="John Doe"
             error={errors.name}
             text="First Name"
             type="text"
@@ -127,7 +124,6 @@ const SignupPage = () => {
 
           <InputField
             htmlFor="email"
-            id="email"
             placeholder="abc@example.com"
             error={errors.email}
             text="Email"
@@ -138,7 +134,6 @@ const SignupPage = () => {
           />
           <InputField
             htmlFor="password"
-            id="password"
             placeholder="********"
             error={errors.password}
             text="Enter Password"
@@ -149,7 +144,6 @@ const SignupPage = () => {
           />
           <InputField
             htmlFor="Avatar-URL"
-            id="Avatar-URL"
             placeholder="https://example.com/avatar.jpg"
             error={errors.avatar}
             text="Avatar URL"
@@ -158,7 +152,11 @@ const SignupPage = () => {
             name="Avatar-URL"
             onChange={handleChange}
           />
-          <button type="submit" className="btn-create" disabled={isLoading}>
+          <button
+            type="submit"
+            className="w-full py-2.5 mt-5 bg-blue-500 text-white rounded hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading}
+          >
             Create Account
           </button>
         </form>
