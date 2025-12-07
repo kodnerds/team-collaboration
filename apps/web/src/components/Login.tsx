@@ -94,6 +94,9 @@ const Login = () => {
           <Link to="/signup" className="text-blue-700 no-underline hover:underline">
             Create Account
           </Link>
+          <Link to="/create-project" className="block mt-4 text-blue-700 no-underline hover:underline">
+            Create Project
+          </Link>
         </div>
       </div>
     </div>
