@@ -112,7 +112,7 @@ const SignupPage = () => {
             Please enter you details to create a new account
           </h3>
           <InputField
-            htmlFor="Name"
+            htmlFor="Full Name"
             placeholder="John Doe"
             error={errors.name}
             text="First Name"
