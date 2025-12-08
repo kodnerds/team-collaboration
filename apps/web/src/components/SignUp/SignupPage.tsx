@@ -40,18 +40,18 @@ const SignupPage = () => {
   const validateSignUp = () => validateLoginFields(formData.email, formData.password);
   const clientSideValidation = () => {
     let isFormValid = true;
-
+    // checking name field
     if (!formData.name.trim()) {
       isFormValid = false;
       setErrors((prev) => ({ ...prev, name: 'Please input a valid name' }));
     }
-
+    // checking password and email
     const validationErrors = validateSignUp();
     if (Object.keys(validationErrors).length > 0) {
       setErrors((prev) => ({ ...prev, ...validationErrors }));
       return;
     }
-
+    // checking avatar url
     if (!isValidUrl(formData.avatar)) {
       isFormValid = false;
       setErrors((prev) => ({ ...prev, avatar: 'Please, input a valid URL' }));
@@ -60,15 +60,18 @@ const SignupPage = () => {
     return isFormValid;
   };
 
+  // handling submssion and sending POST req
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const apiBaseUrl = 'http://localhost:3000';
+
     setErrors({ email: '', name: '', password: '', avatar: '' });
     if (!clientSideValidation()) {
       return;
     }
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:4000/api/v1/auth/signup', {
+      const response = await fetch(`${apiBaseUrl}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -83,6 +86,8 @@ const SignupPage = () => {
           'userSession',
           JSON.stringify({ id, name, authToken, email: formData.email })
         );
+        // reset form
+        setFormData({ ...formData, email: '', name: '', password: '', avatar: '' });
         setTimeout(() => {
           setIsLoading(false);
           navigate('/dashboard');
@@ -93,23 +98,21 @@ const SignupPage = () => {
         setApiError('An unexpected server error occurred. Please try again.');
       }
     } catch (error) {
-      setApiError(`A critical network error occurred. Check your connection. ${error}`);
+      console.error('Network error during signup:', error);
+      setApiError('A critical network error occurred. Check your connection and try again.');
     } finally {
       setIsLoading(false);
     }
-
-    // reset form
-    setFormData({ ...formData, email: '', name: '', password: '', avatar: '' });
   };
 
   return (
     <section className="min-h-screen bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4 relative overflow-hidden">
       <main className="bg-white rounded-lg shadow-xl w-full px-10 py-5  max-w-[450px] relative z-10">
         <Toast message={apiError} duration={3000} />
-        <form onSubmit={handleSubmit} className="form-container">
+        <form onSubmit={handleSubmit} className="form-container" noValidate>
           <h2 className="text-3xl text-center font-semibold text-gray-700 mb-2">Sign up</h2>
           <h3 className="text-center font-semibold text-gray-700 mb-6">
-            Please enter you details to create a new account
+            Please enter your details to create a new account
           </h3>
           <InputField
             htmlFor="Full Name"
@@ -127,7 +130,7 @@ const SignupPage = () => {
             placeholder="abc@example.com"
             error={errors.email}
             text="Email"
-            type="text"
+            type="email"
             value={formData.email}
             name="email"
             onChange={handleChange}
@@ -147,9 +150,9 @@ const SignupPage = () => {
             placeholder="https://example.com/avatar.jpg"
             error={errors.avatar}
             text="Avatar URL"
-            type="textnpm run dev"
+            type="url"
             value={formData.avatar}
-            name="Avatar-URL"
+            name="avatar"
             onChange={handleChange}
           />
           <button
