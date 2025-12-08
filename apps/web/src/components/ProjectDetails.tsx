@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+
 import { getProjectById } from "../utils/api";
 
 interface Project {
@@ -29,7 +30,7 @@ const ProjectDetails = () => {
       <p className="text-gray-700">{project.description}</p>
 
       <button
-        onClick={() => window.history.back()}
+        onClick={() => globalThis.history.back()}
         className="mt-8 px-5 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
       >
         Back

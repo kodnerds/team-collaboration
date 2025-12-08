@@ -5,10 +5,7 @@ export const dummyProjects = [
 ];
 
 // API function that will later call the backend
-export const getProjects = async () => {
-  return dummyProjects;
-};
+export const getProjects = async () => dummyProjects;
 
-export const getProjectById = async (id: number) => {
-  return dummyProjects.find((p) => p.id === id) || null;
-};
+export const getProjectById = async (id: number) => 
+  dummyProjects.find((p) => p.id === id) || null;
