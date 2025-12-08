@@ -1,13 +1,16 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import './App.css';
 
 import Login from './components/Login';
+import ProjectsList from "../src/components/ProjectsList";
+import ProjectDetails from "./components/ProjectDetails";
 
 const App = () => (
   <Routes>
     <Route path="/" element={<Navigate to="/login" />} />
     <Route path="/login" element={<Login />} />
     <Route path="/dashboard" element={<div>Dashboard Placeholder</div>} />
+    <Route path="/projects" element={<ProjectsList />} />
+    <Route path="/projects/:id" element={<ProjectDetails />} />
   </Routes>
 );
 
