@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Login from './components/Login';
-import ProjectsList from "../src/components/ProjectsList";
+import ProjectsList from "./components/ProjectsList";
 import ProjectDetails from "./components/ProjectDetails";
 
 const App = () => (
