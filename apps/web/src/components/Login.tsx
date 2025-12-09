@@ -32,8 +32,8 @@ const Login = () => {
       // Save token
       localStorage.setItem('token', res.accessToken);
 
-      // Redirect to dashboard
-      navigate('/dashboard');
+      // Redirect to projects
+      navigate('/projects');
     } catch (err: unknown) {
       const error = err as { status?: number; message?: string };
       if (error.status === 400) {
@@ -93,6 +93,12 @@ const Login = () => {
           </Link>
           <Link to="/signup" className="text-blue-700 no-underline hover:underline">
             Create Account
+          </Link>
+          <Link
+            to="/create-project"
+            className="block mt-4 text-blue-700 no-underline hover:underline"
+          >
+            Create Project
           </Link>
         </div>
       </div>
