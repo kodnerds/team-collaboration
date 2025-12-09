@@ -5,18 +5,9 @@ import {
   getAllProjects,
   deleteProject,
   updateProject,
-  createTask,
-  getSingleProject,
-  updateTask
+  getSingleProject
 } from '../controller';
-import {
-  validate,
-  projectValidator,
-  authenticate,
-  projectUpdateValidator,
-  taskValidator,
-  taskUpdateValidator
-} from '../middleware';
+import { validate, projectValidator, authenticate, projectUpdateValidator } from '../middleware';
 
 const router = Router();
 
@@ -25,7 +16,5 @@ router.get('/', authenticate, getAllProjects);
 router.put('/:id', authenticate, projectUpdateValidator, validate, updateProject);
 router.delete('/:id', authenticate, deleteProject);
 router.get('/:id', authenticate, getSingleProject);
-router.post('/:projectId/tasks', authenticate, taskValidator, validate, createTask);
-router.patch('/:projectId/tasks/:taskId', authenticate, taskUpdateValidator, validate, updateTask);
 
 export default router;
