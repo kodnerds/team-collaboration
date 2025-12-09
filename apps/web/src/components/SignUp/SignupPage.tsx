@@ -100,6 +100,7 @@ const SignupPage = () => {
         setApiError('An unexpected server error occurred. Please try again.');
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Network error during signup:', error);
       setApiError('A critical network error occurred. Check your connection and try again.');
     } finally {
