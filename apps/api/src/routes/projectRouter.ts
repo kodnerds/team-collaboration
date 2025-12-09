@@ -6,6 +6,7 @@ import {
   deleteProject,
   updateProject,
   createTask,
+  getSingleProject,
   updateTask
 } from '../controller';
 import {
@@ -23,7 +24,7 @@ router.post('/', authenticate, projectValidator, validate, createProject);
 router.get('/', authenticate, getAllProjects);
 router.put('/:id', authenticate, projectUpdateValidator, validate, updateProject);
 router.delete('/:id', authenticate, deleteProject);
-
+router.get('/:id', authenticate, getSingleProject);
 router.post('/:projectId/tasks', authenticate, taskValidator, validate, createTask);
 router.patch('/:projectId/tasks/:taskId', authenticate, taskUpdateValidator, validate, updateTask);
 
