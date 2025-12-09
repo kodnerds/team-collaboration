@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { validateLoginFields } from '../../utils/validation';
+import Toast from '../ui/Toast';
 
 import InputField from './inputField';
 
@@ -34,6 +35,7 @@ const SignupPage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setErrors((prev) => ({ ...prev, [e.target.name]: '' }));
   };
 
   // perfoming client side validation
@@ -63,7 +65,7 @@ const SignupPage = () => {
   // handling submssion and sending POST req
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const apiBaseUrl = 'http://localhost:3000';
+    const base = import.meta.env.VITE_API_URL;
 
     setErrors({ email: '', name: '', password: '', avatar: '' });
     if (!clientSideValidation()) {
@@ -71,7 +73,7 @@ const SignupPage = () => {
     }
     setIsLoading(true);
     try {
-      const response = await fetch(`${apiBaseUrl}/auth/signup`, {
+      const response = await fetch(`${base}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -90,7 +92,7 @@ const SignupPage = () => {
         setFormData({ ...formData, email: '', name: '', password: '', avatar: '' });
         setTimeout(() => {
           setIsLoading(false);
-          navigate('/dashboard');
+          navigate('/login');
         }, 500);
       } else if (response.status === 400 || response.status === 409) {
         setApiError(data.message || `API Error: Status ${response.status}`);
@@ -169,23 +171,3 @@ const SignupPage = () => {
 };
 
 export default SignupPage;
-
-const Toast = ({ message, duration }: { message: string; duration: number }) => {
-  const [isVisible, setIsVisible] = useState(true);
-
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-      }, duration);
-
-      return () => clearTimeout(timer);
-    }
-  }, [message, duration]);
-
-  if (!isVisible) {
-    return null;
-  }
-
-  return <p className={message && 'toast'}>{message}</p>;
-};
