@@ -1,6 +1,7 @@
 import { TaskRepository, ProjectRepository, UserRepository } from '../repository';
 import { HTTP_STATUS } from '../utils/const';
 import logger from '../utils/logger';
+import { paginationParams } from '../utils/pagination';
 
 import type { Request, Response } from 'express';
 
@@ -117,6 +118,57 @@ export const updateTask = async (req: Request, res: Response) => {
         },
         createdAt: updatedTask.createdAt,
         updatedAt: updatedTask.updatedAt
+      }
+    });
+  } catch (error) {
+    logger.error(error);
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+  }
+};
+
+export const getAllTasks = async (req: Request, res: Response) => {
+  try {
+    const { projectId } = req.params;
+    const { page, limit, offset } = paginationParams(req.query);
+
+    if (!projectId) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'Project ID is required' });
+    }
+
+    const projectRepository = new ProjectRepository();
+    const project = await projectRepository.findOne(projectId);
+
+    if (!project) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Project not found' });
+    }
+
+    const taskRepository = new TaskRepository();
+    const [tasks, total] = await taskRepository.findAllByProject({
+      projectId,
+      skip: offset,
+      take: limit,
+      relations: ['createdBy']
+    });
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: 'Tasks fetched successfully',
+      data: tasks.map((task) => ({
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        createdBy: {
+          id: task.createdBy.id,
+          name: task.createdBy.name,
+          email: task.createdBy.email
+        },
+        createdAt: task.createdAt,
+        updatedAt: task.updatedAt
+      })),
+      meta: {
+        page,
+        limit,
+        total
       }
     });
   } catch (error) {
