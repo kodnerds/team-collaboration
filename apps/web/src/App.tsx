@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
+import EditProject from './components/EditProject';
 import CreateProject from './components/Create-project';
 import EditProject from './components/EditProject';
 import Login from './components/Login';
@@ -15,6 +16,7 @@ const App = () => (
     <Route path="/create-project" element={<CreateProject />} />
     <Route path="/projects" element={<ProjectsList />} />
     <Route path="/projects/:id" element={<ProjectDetails />} />
+    <Route path="edit-project/:id" element={<EditProject />} />
     <Route path="edit-project/:id" element={<EditProject />} />
     <Route path="/signup" element={<SignupPage />} />
   </Routes>
