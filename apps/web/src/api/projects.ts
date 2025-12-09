@@ -39,7 +39,7 @@ export interface CreateProjectResponse {
   };
 }
 
-const getAuthHeaders = (): HeadersInit => {
+const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
     'Content-Type': 'application/json',

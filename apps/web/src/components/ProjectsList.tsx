@@ -76,7 +76,7 @@ const ProjectsList = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-2">Unable to Load Projects</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => globalThis.location.reload()}
             className="px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium"
           >
             Try Again
