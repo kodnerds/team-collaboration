@@ -7,7 +7,8 @@ import {
   updateProject,
   createTask,
   getSingleProject,
-  updateTask
+  updateTask,
+  getTask
 } from '../controller';
 import {
   validate,

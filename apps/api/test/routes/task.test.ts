@@ -221,4 +221,43 @@ describe('Tasks', () => {
       expect(response.body.errors[0]).toContain('Status must be one of');
     });
   });
+
+  describe('GET /projects/:projectId/tasks/:taskId', () => {
+    it('should return 200 when task is found', async () => {
+      const response = await factory.app
+        .get(`/projects/${projectId}/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Task fetched successfully');
+      expect(response.body.data).toHaveProperty('id', taskId);
+      expect(response.body.data).toHaveProperty('title', 'Test Task');
+      expect(response.body.data).toHaveProperty('description', 'This is a test task description');
+      expect(response.body.data).toHaveProperty('status', 'todo');
+      expect(response.body.data).toHaveProperty('createdBy');
+    });
+
+    it('should return 404 when task is not found', async () => {
+      const nonExistentTaskId = '2f23cc49-2b8b-4537-9e43-c347f1d08a66';
+      const response = await factory.app
+        .get(`/projects/${projectId}/tasks/${nonExistentTaskId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Task not found');
+    });
+
+    it('should return 404 when project is not found', async () => {
+      const nonExistentProjectId = '2f23cc49-2b8b-4537-9e43-c347f1d08a66';
+      const response = await factory.app
+        .get(`/projects/${nonExistentProjectId}/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Task does not belong to this project');
+    });
+
+    it('should return 401 when unauthenticated', async () => {
+      const response = await factory.app.get(`/projects/${projectId}/tasks/${taskId}`);
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
+    });
+  });
 });

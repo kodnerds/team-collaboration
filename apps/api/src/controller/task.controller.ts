@@ -124,3 +124,48 @@ export const updateTask = async (req: Request, res: Response) => {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
   }
 };
+
+export const getTask = async (req: Request, res: Response) => {
+  try {
+    const { taskId, projectId } = req.params;
+
+    if (!taskId || !projectId) {
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ message: 'Invalid project ID or task ID provided' });
+    }
+
+    const taskRepository = new TaskRepository();
+    const task = await taskRepository.findOne(taskId);
+
+    if (!task) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found' });
+    }
+
+    if (task.project.id !== projectId) {
+      return res
+        .status(HTTP_STATUS.NOT_FOUND)
+        .json({ message: 'Task does not belong to this project' });
+    }
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: 'Task fetched successfully',
+      data: {
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        createdBy: {
+          id: task.createdBy.id,
+          name: task.createdBy.name,
+          email: task.createdBy.email
+        },
+        createdAt: task.createdAt,
+        updatedAt: task.updatedAt
+      }
+    });
+  } catch (error) {
+    logger.error(error);
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+  }
+};
