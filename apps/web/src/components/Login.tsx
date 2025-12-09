@@ -32,8 +32,8 @@ const Login = () => {
       // Save token
       localStorage.setItem('token', res.accessToken);
 
-      // Redirect to dashboard
-      navigate('/dashboard');
+      // Redirect to projects
+      navigate('/projects');
     } catch (err: unknown) {
       const error = err as { status?: number; message?: string };
       if (error.status === 400) {

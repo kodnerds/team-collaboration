@@ -1,11 +1,13 @@
-// Temporary dummy data
-export const dummyProjects = [
-  { id: 1, title: "Project Alpha", description: "This is project alpha." },
-  { id: 2, title: "Project Beta", description: "This is project beta." },
-];
+// Re-export project API functions from the dedicated module
+export { getProjects, createProject, type Project, type ProjectsResponse } from '../api/projects';
 
-// API function that will later call the backend
-export const getProjects = async () => dummyProjects;
-
-export const getProjectById = async (id: number) => 
-  dummyProjects.find((p) => p.id === id) || null;
+// Legacy function for backwards compatibility (used by ProjectDetails)
+export const getProjectById = async (id: number) => {
+  const { getProjects } = await import('../api/projects');
+  try {
+    const response = await getProjects();
+    return response.data.items.find((p) => p.id === id) || null;
+  } catch {
+    return null;
+  }
+};
