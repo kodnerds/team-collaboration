@@ -12,6 +12,12 @@
     "verbatimModuleSyntax": true,
     "noEmit": true,
 
+    /* Path aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     /* Additional linting rules for this app */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
