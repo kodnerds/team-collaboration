@@ -1,6 +1,11 @@
+import {
+  type UserEntity,
+  type ProjectEntity,
+  type TaskEntity,
+  TaskStatus
+} from '../../src/entities';
 import { hashPassword } from '../../src/utils/hashPassword';
 
-import type { UserEntity, ProjectEntity } from '../../src/entities';
 import type { TestFactory } from '../factory';
 
 type User = { name: string; email: string };
@@ -34,4 +39,30 @@ export const createTestProject = async (
     description: data.description || 'Default Project Description',
     createdBy: user
   } as ProjectEntity);
+};
+
+type TaskData = {
+  title?: string;
+  description?: string;
+  status?: string;
+};
+
+type CreateTaskOptions = {
+  user: UserEntity;
+  project: ProjectEntity;
+} & TaskData;
+
+export const createTestTask = async (
+  factory: TestFactory,
+  options: CreateTaskOptions
+): Promise<TaskEntity> => {
+  const { user, project, ...data } = options;
+  const taskRepository = factory._connection.getRepository('TaskEntity');
+  return await taskRepository.save({
+    title: data.title || 'Default Task Title',
+    description: data.description || 'Default Task Description',
+    status: data.status || TaskStatus.TODO,
+    project: project,
+    createdBy: user
+  } as TaskEntity);
 };

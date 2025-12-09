@@ -8,7 +8,7 @@ import { AppDataSource } from './database';
 import routes from './routes';
 import logger from './utils/logger';
 
-const PORT = envConfig.PORT || 3001;
+const PORT = envConfig.PORT || 3000;
 
 const main = async () => {
   const app = express();
