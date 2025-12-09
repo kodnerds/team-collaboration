@@ -34,8 +34,19 @@ const CreateProject = () => {
       return (
         <>
           <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
           </svg>
           Creating Project...
         </>
@@ -111,7 +122,12 @@ const CreateProject = () => {
             aria-label="Back to projects"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </Link>
           <h2 className="text-2xl font-semibold text-gray-700">Create New Project</h2>
@@ -121,8 +137,18 @@ const CreateProject = () => {
         {successMessage && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
             <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="w-5 h-5 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
             <span className="text-green-700 font-medium">{successMessage}</span>
@@ -133,8 +159,18 @@ const CreateProject = () => {
         {errors.general && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
             <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center shrink-0">
-              <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </div>
             <span className="text-red-700">{errors.general}</span>
@@ -164,7 +200,12 @@ const CreateProject = () => {
             {errors.projectName && (
               <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 {errors.projectName}
               </p>
@@ -185,9 +226,7 @@ const CreateProject = () => {
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none hover:border-gray-300 transition text-sm text-gray-900 resize-none"
               disabled={isSubmitting}
             />
-            <p className="mt-1 text-xs text-gray-400">
-              {description.length}/500 characters
-            </p>
+            <p className="mt-1 text-xs text-gray-400">{description.length}/500 characters</p>
           </div>
 
           {/* Submit Button */}
@@ -202,10 +241,7 @@ const CreateProject = () => {
 
         {/* Cancel link */}
         <div className="mt-4 text-center">
-          <Link
-            to="/projects"
-            className="text-sm text-gray-500 hover:text-gray-700 transition"
-          >
+          <Link to="/projects" className="text-sm text-gray-500 hover:text-gray-700 transition">
             Cancel and return to projects
           </Link>
         </div>

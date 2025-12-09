@@ -92,4 +92,3 @@ export const createProject = async (
 
   return response.json();
 };
-

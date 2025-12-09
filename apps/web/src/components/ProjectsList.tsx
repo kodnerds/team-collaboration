@@ -41,10 +41,7 @@ const ProjectsList = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div
-                key={i}
-                className="p-5 rounded-lg border border-gray-200 bg-white shadow-sm"
-              >
+              <div key={i} className="p-5 rounded-lg border border-gray-200 bg-white shadow-sm">
                 <div className="h-6 w-3/4 bg-gray-200 rounded animate-pulse mb-3" />
                 <div className="h-4 w-full bg-gray-100 rounded animate-pulse mb-2" />
                 <div className="h-4 w-2/3 bg-gray-100 rounded animate-pulse" />
@@ -76,9 +73,7 @@ const ProjectsList = () => {
               />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">
-            Unable to Load Projects
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Unable to Load Projects</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -102,7 +97,12 @@ const ProjectsList = () => {
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium shadow-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             New Project
           </Link>
@@ -126,18 +126,22 @@ const ProjectsList = () => {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              No projects yet
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">No projects yet</h2>
             <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-              Get started by creating your first project to organize your tasks and collaborate with your team.
+              Get started by creating your first project to organize your tasks and collaborate with
+              your team.
             </p>
             <Link
               to="/create-project"
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               Create Your First Project
             </Link>
@@ -159,9 +163,7 @@ const ProjectsList = () => {
                 </h2>
 
                 {project.description && (
-                  <p className="text-gray-500 text-sm line-clamp-2 mb-4">
-                    {project.description}
-                  </p>
+                  <p className="text-gray-500 text-sm line-clamp-2 mb-4">{project.description}</p>
                 )}
 
                 {/* Creator info */}
