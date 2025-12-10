@@ -22,8 +22,8 @@ interface Props {
 const CreateTaskModal = ({ projectId, stage, onClose, onTaskCreated }: Props) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // ✔ naming
-  const [isLoading, setIsLoading] = useState(false); // ✔ naming
+  const [errorMessage, setErrorMessage] = useState(""); 
+  const [isLoading, setIsLoading] = useState(false); 
 
   if (!isAuthenticated()) {
     return (
