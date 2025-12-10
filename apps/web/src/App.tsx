@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
-import EditProject from './components/EditProject';
+
 import CreateProject from './components/Create-project';
 import EditProject from './components/EditProject';
 import Login from './components/Login';
