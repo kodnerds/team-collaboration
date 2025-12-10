@@ -1,13 +1,30 @@
-// Re-export project API functions from the dedicated module
-export { getProjects, createProject, type Project, type ProjectsResponse } from '../api/projects';
+import axios from "axios";
 
-// Legacy function for backwards compatibility (used by ProjectDetails)
-export const getProjectById = async (id: number) => {
-  const { getProjects } = await import('../api/projects');
-  try {
-    const response = await getProjects();
-    return response.data.items.find((p) => p.id === id) || null;
-  } catch {
-    return null;
-  }
+export const getProjectById = async (projectId: string | number) => {
+  const token = localStorage.getItem("token");
+
+  const res = await axios.get(`/api/v1/projects/${projectId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
+};
+
+export const createTask = async (payload: {
+  name: string;
+  description?: string;
+  stage: string;
+  projectId: string | number;
+}) => {
+  const token = localStorage.getItem("token");
+
+  const res = await axios.post("/api/v1/tasks", payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data;
 };
