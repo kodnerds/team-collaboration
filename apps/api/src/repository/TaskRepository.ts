@@ -1,11 +1,10 @@
 import { In } from 'typeorm';
 
 import { connect } from '../database';
-import { TaskEntity , UserEntity } from '../entities';
+import { TaskEntity, UserEntity } from '../entities';
 
 import type { ProjectEntity, TaskStatus } from '../entities';
-import type { Repository, FindOptionsSelect} from 'typeorm';
-
+import type { Repository, FindOptionsSelect } from 'typeorm';
 
 export class TaskRepository {
   private repository: Repository<TaskEntity>;
