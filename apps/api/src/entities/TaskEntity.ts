@@ -11,6 +11,7 @@ import { ProjectEntity } from './ProjectEntity';
 import { UserEntity } from './UserEntity';
 
 export enum TaskStatus {
+  BACKLOG = 'backlog',
   TODO = 'todo',
   DOING = 'doing',
   IN_REVIEW = 'in_review',

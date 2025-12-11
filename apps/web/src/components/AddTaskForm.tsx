@@ -1,28 +1,29 @@
-import { useState } from "react";
-import { Plus, X } from "lucide-react";
-import type { ColumnId } from "@/types/kanban";
+import { Plus, X } from 'lucide-react';
+import { useState } from 'react';
+
+import type { TaskStatus } from '@/types/kanban';
 
 interface AddTaskFormProps {
-  columnId: ColumnId;
-  onAdd: (title: string, columnId: ColumnId) => void;
+  columnId: TaskStatus;
+  onAdd: (title: string, columnId: TaskStatus) => void;
 }
 
-export function AddTaskForm({ columnId, onAdd }: AddTaskFormProps) {
+export const AddTaskForm = ({ columnId, onAdd }: AddTaskFormProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim()) {
       onAdd(title.trim(), columnId);
-      setTitle("");
+      setTitle('');
       setIsOpen(false);
     }
   };
 
   const handleCancel = () => {
-    setTitle("");
+    setTitle('');
     setIsOpen(false);
   };
 
@@ -55,8 +56,7 @@ export function AddTaskForm({ columnId, onAdd }: AddTaskFormProps) {
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter a description..."
           className="w-full mb-2 text-sm text-black bg-white border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-600 transition-colors placeholder:text-gray-500"
-        >
-        </textarea>
+        ></textarea>
         <div className="flex items-center gap-2">
           <button
             type="submit"
@@ -68,7 +68,7 @@ export function AddTaskForm({ columnId, onAdd }: AddTaskFormProps) {
           <button
             type="button"
             onClick={handleCancel}
-            className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
+            className="h-8 w-8 flex items-center justify-center rounded-md bg-red-500 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -76,4 +76,4 @@ export function AddTaskForm({ columnId, onAdd }: AddTaskFormProps) {
       </div>
     </form>
   );
-}
+};
