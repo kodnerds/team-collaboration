@@ -10,6 +10,7 @@ interface AddTaskFormProps {
 export function AddTaskForm({ columnId, onAdd }: AddTaskFormProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,8 +47,16 @@ export function AddTaskForm({ columnId, onAdd }: AddTaskFormProps) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter a title..."
-          className="w-full mb-2 text-sm bg-white border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-600 transition-colors placeholder:text-gray-500"
+          className="w-full mb-2 text-sm text-black bg-white border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-600 transition-colors placeholder:text-gray-500"
         />
+        <textarea
+          autoFocus
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Enter a description..."
+          className="w-full mb-2 text-sm text-black bg-white border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-600 transition-colors placeholder:text-gray-500"
+        >
+        </textarea>
         <div className="flex items-center gap-2">
           <button
             type="submit"
