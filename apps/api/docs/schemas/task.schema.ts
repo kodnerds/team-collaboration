@@ -207,3 +207,29 @@ export const TaskListResponseSchema = {
   }
 };
 
+
+export const AssignUserRequestSchema = {
+  type: 'object',
+  required: ['userId'],
+  properties: {
+    userId: {
+      oneOf: [
+        {
+          type: 'string',
+          format: 'uuid',
+          description: 'User ID to assign'
+        },
+        {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'uuid'
+          },
+          description: 'List of User IDs to assign'
+        }
+      ],
+      description: 'User ID or list of User IDs to assign to the task',
+      example: 'user-uuid-123 or ["user-uuid-123", "user-uuid-456"]'
+    }
+  }
+};
