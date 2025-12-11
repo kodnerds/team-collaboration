@@ -370,5 +370,77 @@ export const taskPaths = {
       }
     }
   }
+  ,
+  '/projects/{projectId}/tasks/{taskId}/assign': {
+    patch: {
+      tags: ['Tasks'],
+      summary: 'Assign user to a task',
+      description: 'Assign one or multiple users to a task',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          in: 'path',
+          name: 'projectId',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid'
+          },
+          description: 'Project ID'
+        },
+        {
+          in: 'path',
+          name: 'taskId',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid'
+          },
+          description: 'Task ID'
+        }
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/AssignUserRequest'
+            }
+          }
+        }
+      },
+      responses: {
+        '200': {
+          description: 'Users assigned successfully',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Task'
+              }
+            }
+          }
+        },
+        '400': {
+          $ref: '#/components/responses/ValidationError'
+        },
+        '401': {
+          $ref: '#/components/responses/UnauthorizedError'
+        },
+        '403': {
+          description: 'Forbidden - User is not the project creator',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Error'
+              }
+            }
+          }
+        },
+        '404': {
+          $ref: '#/components/responses/NotFoundError'
+        }
+      }
+    }
+  }
 };
 
