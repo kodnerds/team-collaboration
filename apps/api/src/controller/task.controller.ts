@@ -222,6 +222,60 @@ export const getTask = async (req: Request, res: Response) => {
   }
 };
 
+export const assignUserToTask = async (req: Request, res: Response) => {
+  try {
+    const { taskId, projectId } = req.params;
+    const { userId } = req.body;
+    const { id } = req.user;
+
+    if (!taskId || !projectId || !userId) {
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ message: 'Invalid project ID, task ID or user ID provided' });
+    }
+
+    const taskRepository = new TaskRepository();
+    const task = await taskRepository.findOne(taskId);
+
+    if (!task) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found' });
+    }
+
+    if (task.project.id !== projectId) {
+      return res
+        .status(HTTP_STATUS.NOT_FOUND)
+        .json({ message: 'Task does not belong to this project' });
+    }
+
+    if (task.project.createdBy.id !== id) {
+      return res
+        .status(HTTP_STATUS.FORBIDDEN)
+        .json({ message: 'You are not authorized to assign user to this task' });
+    }
+
+    const userIds = Array.isArray(userId) ? userId : [userId];
+
+    const updatedTask = await taskRepository.assignUserToTask(taskId, userIds);
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: 'Users assigned to task successfully',
+      data: {
+        id: updatedTask.id,
+        title: updatedTask.title,
+        status: updatedTask.status,
+        assignees: updatedTask.assignees.map((assignee) => ({
+          id: assignee.id,
+          name: assignee.name,
+          email: assignee.email
+        }))
+      }
+    });
+  } catch (error) {
+    logger.error(error);
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+  }
+};
+
 export const deleteTask = async (req: Request, res: Response) => {
   try {
     const { taskId, projectId } = req.params;

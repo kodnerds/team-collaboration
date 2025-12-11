@@ -13,6 +13,7 @@ describe('Tasks', () => {
   let projectId: string;
   let taskId: string;
   let testProject: ProjectEntity;
+  let otherAuthToken: string;
 
   beforeAll(async () => {
     await factory.init();
@@ -35,6 +36,17 @@ describe('Tasks', () => {
       email: testUser.email
     };
     authToken = genToken(authenticatedUser);
+
+    const otherUser = await createTestUser(factory, {
+      name: 'Other User',
+      email: 'other@example.com'
+    });
+    const otherAuthenticatedUser: AuthenticatedUser = {
+      id: otherUser.id,
+      name: otherUser.name,
+      email: otherUser.email
+    };
+    otherAuthToken = genToken(otherAuthenticatedUser);
 
     const project = await createTestProject(factory, testUser, {
       name: 'Test Project',
@@ -470,6 +482,73 @@ describe('Tasks', () => {
       const response = await factory.app.get(`/projects/${projectId}/tasks`);
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
+    });
+  });
+
+  describe('PATCH /projects/:projectId/tasks/:taskId/assign', () => {
+    it('should assign users to a task successfully', async () => {
+      const response = await factory.app
+        .patch(`/projects/${projectId}/tasks/${taskId}/assign`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          userId: [testUser.id]
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Users assigned to task successfully');
+      expect(response.body.data).toHaveProperty('id', taskId);
+      expect(response.body.data.assignees).toHaveLength(1);
+      expect(response.body.data.assignees[0]).toHaveProperty('id', testUser.id);
+    });
+
+    it('should return 404 when task not found', async () => {
+      const nonExistentTaskId = '2f23cc49-2b8b-4537-9e43-c347f1d08a66';
+      const response = await factory.app
+        .patch(`/projects/${projectId}/tasks/${nonExistentTaskId}/assign`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          userId: [testUser.id]
+        });
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Task not found');
+    });
+
+    it('should return 404 when project not found', async () => {
+      const nonExistentProjectId = '2f23cc49-2b8b-4537-9e43-c347f1d08a66';
+      const response = await factory.app
+        .patch(`/projects/${nonExistentProjectId}/tasks/${taskId}/assign`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          userId: [testUser.id]
+        });
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Task does not belong to this project');
+    });
+
+    it('should return 401 when unauthenticated', async () => {
+      const response = await factory.app
+        .patch(`/projects/${projectId}/tasks/${taskId}/assign`)
+        .send({
+          userId: [testUser.id]
+        });
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
+    });
+
+    it('should return 403 when user is not authorized to assign users to task', async () => {
+      const response = await factory.app
+        .patch(`/projects/${projectId}/tasks/${taskId}/assign`)
+        .set('Authorization', `Bearer ${otherAuthToken}`)
+        .send({
+          userId: [testUser.id]
+        });
+      expect(response.status).toBe(403);
+      expect(response.body).toHaveProperty(
+        'message',
+        'You are not authorized to assign user to this task'
+      );
     });
   });
 
