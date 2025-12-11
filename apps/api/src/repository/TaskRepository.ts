@@ -1,8 +1,11 @@
-import { connect } from '../database';
-import { TaskEntity } from '../entities';
+import { In } from 'typeorm';
 
-import type { UserEntity, ProjectEntity, TaskStatus } from '../entities';
-import type { Repository, FindOptionsSelect } from 'typeorm';
+import { connect } from '../database';
+import { TaskEntity , UserEntity } from '../entities';
+
+import type { ProjectEntity, TaskStatus } from '../entities';
+import type { Repository, FindOptionsSelect} from 'typeorm';
+
 
 export class TaskRepository {
   private repository: Repository<TaskEntity>;
@@ -58,5 +61,34 @@ export class TaskRepository {
       throw new Error('Task not found after update');
     }
     return updatedTask;
+  }
+
+  async assignUserToTask(taskId: string, userIds: string[]): Promise<TaskEntity> {
+    const task = await this.repository.findOne({
+      where: { id: taskId },
+      relations: ['assignees', 'project', 'createdBy']
+    });
+
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    const users = await connect(UserEntity).find({ where: { id: In(userIds) } });
+    if (!users || users.length === 0) {
+      throw new Error('No users found');
+    }
+
+    if (!task.assignees) {
+      task.assignees = [];
+    }
+
+    users.forEach((user) => {
+      const isAlreadyAssigned = task.assignees.some((assignee) => assignee.id === user.id);
+      if (!isAlreadyAssigned) {
+        task.assignees.push(user);
+      }
+    });
+
+    return await this.repository.save(task);
   }
 }
