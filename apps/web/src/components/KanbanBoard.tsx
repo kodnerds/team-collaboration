@@ -1,85 +1,102 @@
+// components/KanbanBoard.tsx
 import { useState } from "react";
 import type { Task, ColumnId, Column } from "@/types/kanban";
 import { COLUMNS } from "@/types/kanban";
 import { KanbanColumn } from "./KanbanColumn";
-import { Search, Filter, LayoutGrid } from "lucide-react";
-import { initialTasks } from "../lib/mockData";
-// Initial sample tasks
-
+import { LayoutGrid, AlertCircle } from "lucide-react";
+import { useTasks } from "@/hooks/useTasks";
 
 export function KanbanBoard() {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [searchQuery, setSearchQuery] = useState("");
+  // Use the custom hook instead of local state
+  const { tasks, loading, error, createTask, updateTask, deleteTask } = useTasks();
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
-  const filteredTasks = tasks.filter((task) =>
-    task.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
+  // Function to get tasks by column 
   const getTasksByColumn = (columnId: ColumnId) =>
-    filteredTasks.filter((task) => task.columnId === columnId);
+    tasks.filter((task) => task.columnId === columnId);
 
-  const handleAddTask = (title: string, columnId: ColumnId) => {
-    const newTask: Task = {
-      id: `task-${Date.now()}`,
-      title,
-      columnId,
-      createdAt: new Date(),
-    };
-    setTasks([...tasks, newTask]);
+  // Function to add a task - now calls the API
+  const handleAddTask = async (title: string, columnId: ColumnId) => {
+    try {
+      await createTask(title, columnId);
+      // The hook automatically updates the tasks state
+    } catch (err) {
+      // Error handling is done in the hook
+      console.error('Failed to add task:', err);
+    }
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    setTasks(tasks.filter((t) => t.id !== taskId));
+  // Function to delete a task - now calls the API
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      await deleteTask(taskId);
+      // The hook automatically updates the tasks state
+    } catch (err) {
+      console.error('Failed to delete task:', err);
+    }
   };
 
+  // This function runs when you START dragging a task
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
     setDraggedTaskId(taskId);
     e.dataTransfer.effectAllowed = "move";
   };
 
+  // This function runs when a dragged item is dragged OVER a drop zone
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
   };
 
-  const handleDrop = (e: React.DragEvent, columnId: ColumnId) => {
+  // This function runs when you DROP the dragged task - now calls the API
+  const handleDrop = async (e: React.DragEvent, columnId: ColumnId) => {
     e.preventDefault();
+    
     if (draggedTaskId) {
-      setTasks(
-        tasks.map((task) =>
-          task.id === draggedTaskId ? { ...task, columnId } : task
-        )
-      );
-      setDraggedTaskId(null);
+      try {
+        // Update the task's column in the backend
+        await updateTask(draggedTaskId, { columnId });
+        // The hook automatically updates the tasks state
+      } catch (err) {
+        console.error('Failed to move task:', err);
+      } finally {
+        setDraggedTaskId(null);
+      }
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-white">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading tasks...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-white">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+      <header className="flex items-center px-6 py-4 border-b border-gray-200 bg-white">
         <div className="flex items-center gap-3">
           <LayoutGrid className="w-5 h-5 text-blue-600" />
           <h1 className="text-lg font-semibold text-gray-900">Project Board</h1>
         </div>
-        {/* <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Filter by keyword or field"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 w-72 h-9 text-sm bg-white border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-600 transition-colors placeholder:text-gray-500"
-            />
-          </div>
-          <button className="flex items-center gap-2 h-9 px-3 text-sm font-medium border border-gray-200 rounded-md hover:bg-gray-100 transition-colors">
-            <Filter className="w-4 h-4" />
-            Filter
-          </button>
-        </div> */}
       </header>
+
+      {/* Error message */}
+      {error && (
+        <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-red-800">Error</p>
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        </div>
+      )}
 
       {/* Board */}
       <div className="flex-1 overflow-x-auto p-6">
