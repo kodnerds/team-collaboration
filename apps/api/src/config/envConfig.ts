@@ -10,7 +10,10 @@ const envConfig = cleanEnv(process.env, {
   POSTGRES_PORT: port({ default: undefined }),
   POSTGRES_HOST: str({ default: undefined }),
   LOG_LEVEL: str({ default: 'debug' }),
-  ACCESS_TOKEN_SECRET: str({ default: undefined })
+  ACCESS_TOKEN_SECRET: str({ default: undefined }),
+  MAILGUN_DOMAIN: str({ default: 'sandboxd04c8ae18b03487a807336b787df65a9.mailgun.org' }),
+  MAILGUN_API_KEY: str({ default: undefined}),
+  FRONTEND_URL: str({ default: 'http://localhost:3000' }),
 });
 
 const extendedEnvConfig = {

@@ -14,7 +14,7 @@ import logger from './utils/logger';
 
 const PORT = envConfig.PORT || 3000;
 
-const main = async () => {
+const main = async () =>   {
   const app = express();
 
   app.use(
