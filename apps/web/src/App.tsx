@@ -2,9 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
 import CreateProject from './components/Create-project';
-import Login from './components/Login';
 import { KanbanBoard } from './components/KanbanBoard';
-import ProjectDetails from './components/ProjectDetails';
+import Login from './components/Login';
 import ProjectsList from './components/ProjectsList';
 import SignupPage from './components/SignUp/SignupPage';
 
@@ -16,7 +15,7 @@ const App = () => (
     <Route path="/tasks" element={<KanbanBoard />} />
     <Route path="/create-project" element={<CreateProject />} />
     <Route path="/projects" element={<ProjectsList />} />
-    <Route path="/projects/:id" element={<ProjectDetails />} />
+    <Route path="/projects/:id" element={<KanbanBoard />} />
     <Route path="/signup" element={<SignupPage />} />
   </Routes>
 );

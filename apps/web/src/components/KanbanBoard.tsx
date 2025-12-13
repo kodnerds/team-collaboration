@@ -1,72 +1,95 @@
-// components/KanbanBoard.tsx
-import { useState } from "react";
-import type { Task, ColumnId, Column } from "@/types/kanban";
-import { COLUMNS } from "@/types/kanban";
-import { KanbanColumn } from "./KanbanColumn";
-import { LayoutGrid, AlertCircle } from "lucide-react";
-import { useTasks } from "@/hooks/useTasks";
+import { LayoutGrid, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
-export function KanbanBoard() {
-  // Use the custom hook instead of local state
-  const { tasks, loading, error, createTask, updateTask, deleteTask } = useTasks();
+import { KanbanColumn } from './KanbanColumn';
+
+import type { TaskStatus, Column, Task } from '@/types/kanban';
+
+import { fetchTasksByProject, createTask, updateTask, deleteTask } from '@/api/tasks';
+import { COLUMNS } from '@/types/kanban';
+
+const handleDragOver = (e: React.DragEvent) => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+};
+
+export const KanbanBoard = () => {
+  const { id } = useParams<{ id: string }>();
+
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
-  // Function to get tasks by column 
-  const getTasksByColumn = (columnId: ColumnId) =>
-    tasks.filter((task) => task.columnId === columnId);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!id) return;
 
-  // Function to add a task - now calls the API
-  const handleAddTask = async (title: string, columnId: ColumnId) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetchTasksByProject(id);
+        setTasks(response.data);
+      } catch (err: unknown) {
+        const error = err as { message?: string };
+        setError(error.message || 'Failed to load tasks');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  const getTasksByColumn = (columnId: TaskStatus) =>
+    tasks?.filter((task) => task.status === columnId);
+
+  const handleAddTask = async (title: string, status: TaskStatus) => {
+    if (!id) return;
+
     try {
-      await createTask(title, columnId);
-      // The hook automatically updates the tasks state
+      await createTask(id, title, status);
     } catch (err) {
-      // Error handling is done in the hook
-      console.error('Failed to add task:', err);
+      const error = err as { message?: string };
+      setError(error.message || 'Failed to add task');
     }
   };
 
-  // Function to delete a task - now calls the API
   const handleDeleteTask = async (taskId: string) => {
     try {
       await deleteTask(taskId);
-      // The hook automatically updates the tasks state
+      setTasks((prev) => prev.filter((task) => task.id !== taskId));
     } catch (err) {
-      console.error('Failed to delete task:', err);
+      const error = err as { message?: string };
+      setError(error.message || 'Failed to delete task');
     }
   };
 
-  // This function runs when you START dragging a task
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
     setDraggedTaskId(taskId);
-    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.effectAllowed = 'move';
   };
 
-  // This function runs when a dragged item is dragged OVER a drop zone
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent, columnId: TaskStatus) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
 
-  // This function runs when you DROP the dragged task - now calls the API
-  const handleDrop = async (e: React.DragEvent, columnId: ColumnId) => {
-    e.preventDefault();
-    
     if (draggedTaskId) {
       try {
-        // Update the task's column in the backend
-        await updateTask(draggedTaskId, { columnId });
-        // The hook automatically updates the tasks state
+        await updateTask(draggedTaskId, { status: columnId });
+        setTasks((prev) =>
+          prev.map((task) => (task.id === draggedTaskId ? { ...task, status: columnId } : task))
+        );
       } catch (err) {
-        console.error('Failed to move task:', err);
+        const error = err as { message?: string };
+        setError(error.message || 'Failed to move task');
       } finally {
         setDraggedTaskId(null);
       }
     }
   };
 
-  // Loading state
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-white">
         <div className="text-center">
@@ -106,15 +129,15 @@ export function KanbanBoard() {
               key={column.id}
               column={column}
               tasks={getTasksByColumn(column.id)}
-              onAddTask={handleAddTask}
+              onAddTask={(title) => handleAddTask(title, column.id)}
               onDeleteTask={handleDeleteTask}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
-              onDrop={handleDrop}
+              onDrop={(e) => handleDrop(e, column.id)}
             />
           ))}
         </div>
       </div>
     </div>
   );
-}
+};

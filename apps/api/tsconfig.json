@@ -17,5 +17,5 @@
     "strictPropertyInitialization": false
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["src", "test", "eslint.config.mjs", "jest.config.ts"]
+  "include": ["src", "docs", "test", "eslint.config.mjs", "jest.config.ts"]
 }

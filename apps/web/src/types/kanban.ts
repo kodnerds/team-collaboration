@@ -1,15 +1,23 @@
-export type ColumnId = 'backlog' | 'todo' | 'inprogress' | 'review' | 'done';
+export type TaskStatus = 'backlog' | 'todo' | 'doing' | 'in_review' | 'approved' | 'done';
+
+export interface CreatedBy {
+  id: string;
+  name: string;
+  email: string;
+}
 
 export interface Task {
   id: string;
   title: string;
   description?: string;
-  columnId: ColumnId;
-  createdAt: Date;
+  status: TaskStatus;
+  createdBy: CreatedBy;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Column {
-  id: ColumnId;
+  id: TaskStatus;
   title: string;
   description: string;
 }
@@ -17,8 +25,8 @@ export interface Column {
 export const COLUMNS: Column[] = [
   { id: 'backlog', title: 'Backlog', description: 'Items that need to be prioritized' },
   { id: 'todo', title: 'To Do', description: 'Ready to be picked up' },
-  { id: 'inprogress', title: 'In Progress', description: 'Currently being worked on' },
-  { id: 'review', title: 'Review', description: 'Awaiting review' },
-  { id: 'done', title: 'Done', description: 'Completed items' },
+  { id: 'doing', title: 'In Progress', description: 'Currently being worked on' },
+  { id: 'in_review', title: 'Review', description: 'Awaiting review' },
+  { id: 'approved', title: 'Approved', description: 'Awaiting review' },
+  { id: 'done', title: 'Done', description: 'Completed items' }
 ];
-
