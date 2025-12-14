@@ -4,10 +4,12 @@ import { useParams } from 'react-router-dom';
 
 import { KanbanColumn } from './KanbanColumn';
 
-import type { TaskStatus, Column, Task } from '@/types/kanban';
-
 import { fetchTasksByProject, createTask, updateTask, deleteTask } from '@/api/tasks';
 import { COLUMNS } from '@/types/kanban';
+
+import { assignUserToTask } from '@/api/tasks';
+import type { TaskStatus, Column, Task, ProjectMember } from '@/types/kanban';
+
 
 const handleDragOver = (e: React.DragEvent) => {
   e.preventDefault();
@@ -88,6 +90,29 @@ export const KanbanBoard = () => {
       }
     }
   };
+
+  const handleAssignUser = async (
+    taskId: string,
+    user: ProjectMember | null
+  ) => {
+    try {
+      const response = await assignUserToTask(
+        taskId,
+        user ? user.id : null
+      );
+  
+      const updatedTask: Task = response.data;
+  
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === updatedTask.id ? updatedTask : task
+        )
+      );
+    } catch (err: any) {
+      setError(err.message || 'Failed to assign user');
+    }
+  };
+  
 
   if (isLoading) {
     return (

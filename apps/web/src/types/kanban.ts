@@ -12,6 +12,7 @@ export interface Task {
   description?: string;
   status: TaskStatus;
   createdBy: CreatedBy;
+  assignedUser?: User | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,6 +21,19 @@ export interface Column {
   id: TaskStatus;
   title: string;
   description: string;
+}
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+}
+
+export interface ProjectMember {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
 }
 
 export const COLUMNS: Column[] = [

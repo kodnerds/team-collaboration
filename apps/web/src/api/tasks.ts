@@ -95,3 +95,21 @@ export const deleteTask = async (taskId: string): Promise<boolean> => {
 
   return true;
 };
+
+export const assignUserToTask = async (
+  taskId: string,
+  assignedUserId: string | null
+): Promise<{ data: Task }> => {
+  const response = await fetch(`${base}/tasks/${taskId}`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ assignedUserId })
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to assign user');
+  }
+
+  return response.json();
+};
+

@@ -3,13 +3,15 @@ import { useState, useRef, useEffect } from 'react';
 
 import { StatusIndicator } from './StatusIndicator';
 
-import type { Task } from '@/types/kanban';
+import type { Task, User } from '@/types/kanban';
 
 interface TaskCardProps {
   task: Task;
   onDelete: (taskId: string) => void;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
+  onAssignUser: (taskId: string, user: ProjectMember | null) => Promise<void>;
 }
+
 
 export const TaskCard = ({ task, onDelete, onDragStart }: TaskCardProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -67,6 +69,13 @@ export const TaskCard = ({ task, onDelete, onDragStart }: TaskCardProps) => {
                 <Trash2 className="w-4 h-4" />
                 Delete
               </button>
+              <button
+  onClick={() => onAssignUser(task.id, null)}
+  className="h-6 w-6 rounded-full bg-gray-200 hover:bg-gray-300 text-xs"
+  title="Assign user"
+>
+  +
+</button>
             </div>
           )}
         </div>
