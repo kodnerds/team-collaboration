@@ -225,25 +225,33 @@ export const getTask = async (req: Request, res: Response) => {
 export const deleteTask = async (req: Request, res: Response) => {
   try {
     const { taskId, projectId } = req.params;
-    const { id: userId } = req.user;  
+    const { id: userId } = req.user;
     if (!taskId || !projectId) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'Task ID and Project ID are required' });
-    } 
+    }
+
+    const userRepository = new UserRepository();
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: 'User not found' });
+    }
+
     const taskRepository = new TaskRepository();
-    const task = await taskRepository.findOne(taskId);  
+    const task = await taskRepository.findOne(taskId);
     if (!task) {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found' });
-    }       
+    }
     if (task.project.id !== projectId) {
-      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task does not belong to this project' });
-    } 
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found in this project' });
+    }
     if (task.project.createdBy.id !== userId) {
       return res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'You are not authorized to delete this task' });
-    }     
+    }
     await taskRepository.delete(taskId);
     return res.status(HTTP_STATUS.OK).json({ message: 'Task deleted successfully' });
   } catch (error) {
     logger.error(error);
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
-  }       
+  }
 };
