@@ -7,6 +7,7 @@ import EditProject from './components/EditProject';
 import Login from './components/Login';
 import ProjectsList from './components/ProjectsList';
 import SignupPage from './components/SignUp/SignupPage';
+import ProjectDetails from './components/ProjectDetails';
 
 const App = () => (
   <Routes>
