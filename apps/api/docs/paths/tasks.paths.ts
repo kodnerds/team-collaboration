@@ -213,6 +213,74 @@ export const taskPaths = {
           $ref: '#/components/responses/NotFoundError'
         }
       }
+    },
+    delete: {
+      tags: ['Tasks'],
+      summary: 'Delete a task',
+      description: 'Delete a specific task within a project. Only the project creator can delete tasks.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          in: 'path',
+          name: 'projectId',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid'
+          },
+          description: 'Project ID'
+        },
+        {
+          in: 'path',
+          name: 'taskId',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid'
+          },
+          description: 'Task ID'
+        }
+      ],
+      responses: {
+        '200': {
+          description: 'Task deleted successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  message: {
+                    type: 'string',
+                    example: 'Task deleted successfully'
+                  }
+                }
+              }
+            }
+          }
+        },
+        '401': {
+          $ref: '#/components/responses/UnauthorizedError'
+        },
+        '403': {
+          description: 'Forbidden - User not authorized to delete this task',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  message: {
+                    type: 'string',
+                    example: 'You are not authorized to delete this task'
+                  }
+                }
+              }
+            }
+          }
+        },
+        '404': {
+          $ref: '#/components/responses/NotFoundError'
+        }
+      }
     }
   }
 };

@@ -472,4 +472,57 @@ describe('Tasks', () => {
       expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
     });
   });
+
+  describe('DELETE /projects/:projectId/tasks/:taskId', () => {
+    it('should delete a task successfully', async () => {
+      const response = await factory.app
+        .delete(`/projects/${projectId}/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Task deleted successfully');
+
+      const getResponse = await factory.app
+        .get(`/projects/${projectId}/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(getResponse.status).toBe(404);
+    });
+
+    it('should return 404 when task not found or does not belong to project', async () => {
+      const nonExistentTaskId = '2f23cc49-2b8b-4537-9e43-c347f1d08a66';
+      const response = await factory.app
+        .delete(`/projects/${projectId}/tasks/${nonExistentTaskId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Task not found');
+    });
+
+    it('should return 403 when user is not the project creator', async () => {
+      const otherUser = await createTestUser(factory, {
+        name: 'Jane Doe',
+        email: 'jane@example.com'
+      });
+      const otherUserToken = genToken({
+        id: otherUser.id,
+        name: otherUser.name,
+        email: otherUser.email
+      });
+
+      const response = await factory.app
+        .delete(`/projects/${projectId}/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${otherUserToken}`);
+
+      expect(response.status).toBe(403);
+      expect(response.body).toHaveProperty('message', 'You are not authorized to delete this task');
+    });
+
+    it('should return 401 when unauthenticated', async () => {
+      const response = await factory.app.delete(`/projects/${projectId}/tasks/${taskId}`);
+
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
+    });
+  });
 });

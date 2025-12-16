@@ -59,4 +59,8 @@ export class TaskRepository {
     }
     return updatedTask;
   }
+
+  async delete(id: string): Promise<void> {
+    await this.repository.delete(id);
+  }
 }
