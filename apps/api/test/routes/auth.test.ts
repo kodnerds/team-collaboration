@@ -255,6 +255,18 @@ describe('GET /users', () => {
     expect(response.body.data).toHaveLength(2);
   });
 
+  it('Response structure should match the expected shape', async () => {
+    const response = await factory.app.get('/auth').set('Authorization', `Bearer ${authToken}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data).toHaveLength(2);
+    expect(response.body.data[0]).toHaveProperty('id');
+    expect(response.body.data[0]).toHaveProperty('name');
+    expect(response.body.data[0]).toHaveProperty('email');
+    expect(response.body.data[0]).toHaveProperty('avatarUrl');
+  });
+
   it('should return 401 for unauthenticated requests', async () => {
     const response = await factory.app.get('/auth');
 
