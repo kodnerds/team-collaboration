@@ -64,8 +64,47 @@ export const AuthResponseSchema = {
       description: 'JWT access token',
       example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
     },
-    user: {
-      $ref: '#/components/schemas/User'
+    data: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          description: 'User unique identifier'
+        },
+        name: {
+          type: 'string',
+          description: 'User full name',
+          example: 'John Doe'
+        }
+      },
+      description: 'User data without sensitive fields (email and password are excluded)'
+    }
+  }
+};
+
+export const SignupResponseSchema = {
+  type: 'object',
+  properties: {
+    message: {
+      type: 'string',
+      example: 'User created successfully'
+    },
+    data: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          description: 'User unique identifier'
+        },
+        name: {
+          type: 'string',
+          description: 'User full name',
+          example: 'John Doe'
+        }
+      },
+      description: 'User data without sensitive fields (email and password are excluded)'
     }
   }
 };

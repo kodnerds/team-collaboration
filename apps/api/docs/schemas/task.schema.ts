@@ -25,11 +25,25 @@ export const TaskSchema = {
       description: 'Task status',
       default: 'todo'
     },
-    project: {
-      $ref: '#/components/schemas/Project'
-    },
     createdBy: {
-      $ref: '#/components/schemas/User'
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          description: 'User unique identifier'
+        },
+        name: {
+          type: 'string',
+          description: 'User full name'
+        },
+        email: {
+          type: 'string',
+          format: 'email',
+          description: 'User email address'
+        }
+      },
+      description: 'User who created the task'
     },
     createdAt: {
       type: 'string',
@@ -41,7 +55,65 @@ export const TaskSchema = {
       format: 'date-time',
       description: 'Last update timestamp'
     }
-  }
+  },
+  description: 'Task object for get/update operations (project relation not included)'
+};
+
+export const TaskCreateResponseDataSchema = {
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+      format: 'uuid',
+      description: 'Unique identifier'
+    },
+    title: {
+      type: 'string',
+      description: 'Task title'
+    },
+    status: {
+      type: 'string',
+      enum: ['todo', 'doing', 'in_review', 'approved', 'done'],
+      description: 'Task status',
+      default: 'todo'
+    },
+    project: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          description: 'Project unique identifier'
+        },
+        name: {
+          type: 'string',
+          description: 'Project name'
+        }
+      },
+      description: 'Minimal project information'
+    },
+    createdBy: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          format: 'uuid',
+          description: 'User unique identifier'
+        },
+        name: {
+          type: 'string',
+          description: 'User full name'
+        },
+        email: {
+          type: 'string',
+          format: 'email',
+          description: 'User email address'
+        }
+      },
+      description: 'User who created the task'
+    }
+  },
+  description: 'Task creation response (no description or timestamps, includes project info)'
 };
 
 export const CreateTaskRequestSchema = {
@@ -90,9 +162,39 @@ export const UpdateTaskRequestSchema = {
   }
 };
 
+export const TaskCreateResponseSchema = {
+  type: 'object',
+  properties: {
+    message: {
+      type: 'string',
+      example: 'Task created successfully'
+    },
+    data: {
+      $ref: '#/components/schemas/TaskCreateResponseData'
+    }
+  }
+};
+
+export const TaskResponseSchema = {
+  type: 'object',
+  properties: {
+    message: {
+      type: 'string',
+      example: 'Task fetched successfully'
+    },
+    data: {
+      $ref: '#/components/schemas/Task'
+    }
+  }
+};
+
 export const TaskListResponseSchema = {
   type: 'object',
   properties: {
+    message: {
+      type: 'string',
+      example: 'Tasks fetched successfully'
+    },
     data: {
       type: 'array',
       items: {
