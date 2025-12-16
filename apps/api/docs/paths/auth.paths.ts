@@ -24,7 +24,7 @@ export const authPaths = {
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/AuthResponse'
+                $ref: '#/components/schemas/SignupResponse'
               }
             }
           }

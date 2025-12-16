@@ -37,7 +37,7 @@ export const taskPaths = {
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/Task'
+                $ref: '#/components/schemas/TaskCreateResponse'
               }
             }
           }
@@ -142,7 +142,7 @@ export const taskPaths = {
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/Task'
+                $ref: '#/components/schemas/TaskResponse'
               }
             }
           }
@@ -198,7 +198,7 @@ export const taskPaths = {
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/Task'
+                $ref: '#/components/schemas/TaskResponse'
               }
             }
           }
