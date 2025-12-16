@@ -227,7 +227,9 @@ export const deleteTask = async (req: Request, res: Response) => {
     const { taskId, projectId } = req.params;
     const { id: userId } = req.user;
     if (!taskId || !projectId) {
-      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'Task ID and Project ID are required' });
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ message: 'Task ID and Project ID are required' });
     }
 
     const userRepository = new UserRepository();
@@ -246,7 +248,9 @@ export const deleteTask = async (req: Request, res: Response) => {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found in this project' });
     }
     if (task.project.createdBy.id !== userId) {
-      return res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'You are not authorized to delete this task' });
+      return res
+        .status(HTTP_STATUS.FORBIDDEN)
+        .json({ message: 'You are not authorized to delete this task' });
     }
     await taskRepository.delete(taskId);
     return res.status(HTTP_STATUS.OK).json({ message: 'Task deleted successfully' });
