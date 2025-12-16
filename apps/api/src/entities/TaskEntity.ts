@@ -4,7 +4,9 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   CreateDateColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
+  ManyToMany,
+  JoinTable
 } from 'typeorm';
 
 import { ProjectEntity } from './ProjectEntity';
@@ -42,6 +44,10 @@ export class TaskEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.tasks)
   createdBy: UserEntity;
+
+  @ManyToMany(() => UserEntity, (user) => user.assignedTasks)
+  @JoinTable()
+  assignees: UserEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

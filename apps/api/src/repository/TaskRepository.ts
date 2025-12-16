@@ -1,7 +1,7 @@
 import { connect } from '../database';
 import { TaskEntity } from '../entities';
 
-import type { UserEntity, ProjectEntity, TaskStatus } from '../entities';
+import type { ProjectEntity, TaskStatus, UserEntity } from '../entities';
 import type { Repository, FindOptionsSelect } from 'typeorm';
 
 export class TaskRepository {
@@ -25,7 +25,7 @@ export class TaskRepository {
   async findOne(id: string): Promise<TaskEntity | null> {
     return await this.repository.findOne({
       where: { id },
-      relations: ['project', 'createdBy', 'project.createdBy']
+      relations: ['project', 'createdBy', 'project.createdBy', 'assignees']
     });
   }
 
@@ -62,5 +62,9 @@ export class TaskRepository {
 
   async delete(id: string): Promise<void> {
     await this.repository.delete(id);
+  }
+
+  async save(task: TaskEntity): Promise<TaskEntity> {
+    return await this.repository.save(task);
   }
 }

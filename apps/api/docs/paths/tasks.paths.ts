@@ -158,7 +158,7 @@ export const taskPaths = {
     patch: {
       tags: ['Tasks'],
       summary: 'Update a task',
-      description: 'Update an existing task',
+      description: 'Update an existing task within a project',
       security: [{ bearerAuth: [] }],
       parameters: [
         {
@@ -217,7 +217,7 @@ export const taskPaths = {
     delete: {
       tags: ['Tasks'],
       summary: 'Delete a task',
-      description: 'Delete a specific task within a project. Only the project creator can delete tasks.',
+      description: 'Delete a specific task within a project.',
       security: [{ bearerAuth: [] }],
       parameters: [
         {
@@ -261,8 +261,66 @@ export const taskPaths = {
         '401': {
           $ref: '#/components/responses/UnauthorizedError'
         },
-        '403': {
-          description: 'Forbidden - User not authorized to delete this task',
+        '404': {
+          $ref: '#/components/responses/NotFoundError'
+        }
+      }
+    }
+  }
+  ,
+  '/projects/{projectId}/tasks/{taskId}/assignees': {
+    post: {
+      tags: ['Tasks'],
+      summary: 'Assign users to a task',
+      description:
+        'Assign one or more users to a task. Assigned users are stored as a Many-to-Many relation. ' +
+        'Duplicate assignments are automatically prevented.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          in: 'path',
+          name: 'projectId',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid'
+          },
+          description: 'Project ID'
+        },
+        {
+          in: 'path',
+          name: 'taskId',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid'
+          },
+          description: 'Task ID'
+        }
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/AssignUsersToTaskRequest'
+            }
+          }
+        }
+      },
+      responses: {
+        '200': {
+          description: 'Users assigned to task successfully',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/AssignUsersToTaskResponse'
+              }
+            }
+          }
+        },
+        '400': {
+          description: 'Bad Request - Invalid or empty user list',
           content: {
             'application/json': {
               schema: {
@@ -270,15 +328,44 @@ export const taskPaths = {
                 properties: {
                   message: {
                     type: 'string',
-                    example: 'You are not authorized to delete this task'
+                    example: 'Invalid or empty user list'
                   }
                 }
               }
             }
           }
         },
+        '401': {
+          $ref: '#/components/responses/UnauthorizedError'
+        },
         '404': {
-          $ref: '#/components/responses/NotFoundError'
+          description: 'Not Found - Project, task, or one or more users not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  message: {
+                    type: 'string',
+                    examples: {
+                      project: {
+                        value: 'Project not found'
+                      },
+                      task: {
+                        value: 'Task not found'
+                      },
+                      taskProject: {
+                        value: 'Task does not belong to this project'
+                      },
+                      users: {
+                        value: 'One or more users not found'
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

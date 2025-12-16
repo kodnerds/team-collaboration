@@ -1,3 +1,5 @@
+import { In } from 'typeorm';
+
 import { connect } from '../database';
 import { UserEntity } from '../entities';
 
@@ -16,6 +18,10 @@ export class UserRepository {
 
   async findById(id: string): Promise<UserEntity | null> {
     return await this.repository.findOneBy({ id });
+  }
+
+  async findByIds(ids: string[]): Promise<UserEntity[]> {
+    return await this.repository.find({ where: { id: In(ids) } });
   }
 
   async create(userData: {
