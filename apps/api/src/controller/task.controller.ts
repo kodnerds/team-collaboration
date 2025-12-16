@@ -87,16 +87,6 @@ export const updateTask = async (req: Request, res: Response) => {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found' });
     }
 
-    if (task.project.id !== projectId) {
-      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found in this project' });
-    }
-
-    if (task.project.createdBy.id !== userId) {
-      return res
-        .status(HTTP_STATUS.FORBIDDEN)
-        .json({ message: 'You are not authorized to update this task' });
-    }
-
     const updatedTask = await taskRepository.update({
       id: taskId,
       title,
@@ -147,7 +137,7 @@ export const getAllTasks = async (req: Request, res: Response) => {
       projectId,
       skip: offset,
       take: limit,
-      relations: ['createdBy']
+      relations: ['createdBy', 'assignees']
     });
 
     return res.status(HTTP_STATUS.OK).json({
@@ -162,6 +152,13 @@ export const getAllTasks = async (req: Request, res: Response) => {
           name: task.createdBy.name,
           email: task.createdBy.email
         },
+        assignees: task.assignees
+          ? task.assignees.map((assignee) => ({
+              id: assignee.id,
+              name: assignee.name,
+              email: assignee.email
+            }))
+          : [],
         createdAt: task.createdAt,
         updatedAt: task.updatedAt
       })),
@@ -212,6 +209,13 @@ export const getTask = async (req: Request, res: Response) => {
           name: task.createdBy.name,
           email: task.createdBy.email
         },
+        assignees: task.assignees
+          ? task.assignees.map((assignee) => ({
+              id: assignee.id,
+              name: assignee.name,
+              email: assignee.email
+            }))
+          : [],
         createdAt: task.createdAt,
         updatedAt: task.updatedAt
       }
@@ -225,13 +229,23 @@ export const getTask = async (req: Request, res: Response) => {
 export const assignUserToTask = async (req: Request, res: Response) => {
   try {
     const { taskId, projectId } = req.params;
-    const { userId } = req.body;
-    const { id } = req.user;
+    const { userIds } = req.body;
 
-    if (!taskId || !projectId || !userId) {
+    if (!taskId || !projectId) {
       return res
         .status(HTTP_STATUS.BAD_REQUEST)
-        .json({ message: 'Invalid project ID, task ID or user ID provided' });
+        .json({ message: 'Task ID and Project ID are required' });
+    }
+
+    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'Invalid or empty user list' });
+    }
+
+    const projectRepository = new ProjectRepository();
+    const project = await projectRepository.findOne(projectId);
+
+    if (!project) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Project not found' });
     }
 
     const taskRepository = new TaskRepository();
@@ -241,21 +255,26 @@ export const assignUserToTask = async (req: Request, res: Response) => {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found' });
     }
 
-    if (task.project.id !== projectId) {
-      return res
-        .status(HTTP_STATUS.NOT_FOUND)
-        .json({ message: 'Task does not belong to this project' });
+    const userRepository = new UserRepository();
+    const users = await userRepository.findByIds(userIds);
+
+    if (users.length !== userIds.length) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'One or more users not found' });
     }
 
-    if (task.project.createdBy.id !== id) {
-      return res
-        .status(HTTP_STATUS.FORBIDDEN)
-        .json({ message: 'You are not authorized to assign user to this task' });
+    if (!task.assignees) {
+      task.assignees = [];
     }
 
-    const userIds = Array.isArray(userId) ? userId : [userId];
+    // Assign users to task (prevent duplicates)
+    users.forEach((user) => {
+      const isAlreadyAssigned = task.assignees.some((assignee) => assignee.id === user.id);
+      if (!isAlreadyAssigned) {
+        task.assignees.push(user);
+      }
+    });
 
-    const updatedTask = await taskRepository.assignUserToTask(taskId, userIds);
+    const updatedTask = await taskRepository.save(task);
 
     return res.status(HTTP_STATUS.OK).json({
       message: 'Users assigned to task successfully',
@@ -298,14 +317,7 @@ export const deleteTask = async (req: Request, res: Response) => {
     if (!task) {
       return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found' });
     }
-    if (task.project.id !== projectId) {
-      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found in this project' });
-    }
-    if (task.project.createdBy.id !== userId) {
-      return res
-        .status(HTTP_STATUS.FORBIDDEN)
-        .json({ message: 'You are not authorized to delete this task' });
-    }
+
     await taskRepository.delete(taskId);
     return res.status(HTTP_STATUS.OK).json({ message: 'Task deleted successfully' });
   } catch (error) {

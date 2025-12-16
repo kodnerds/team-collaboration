@@ -20,6 +20,9 @@ import {
   UpdateProjectRequestSchema
 } from './project.schema';
 import {
+  AssignUsersToTaskRequestSchema,
+  AssignUsersToTaskResponseDataSchema,
+  AssignUsersToTaskResponseSchema,
   CreateTaskRequestSchema,
   TaskCreateResponseDataSchema,
   TaskCreateResponseSchema,
@@ -63,6 +66,9 @@ export const schemas = {
   TaskCreateResponseData: TaskCreateResponseDataSchema,
   TaskCreateResponse: TaskCreateResponseSchema,
   TaskResponse: TaskResponseSchema,
-  TaskListResponse: TaskListResponseSchema
+  TaskListResponse: TaskListResponseSchema,
+  AssignUsersToTaskRequest: AssignUsersToTaskRequestSchema,
+  AssignUsersToTaskResponseData: AssignUsersToTaskResponseDataSchema,
+  AssignUsersToTaskResponse: AssignUsersToTaskResponseSchema
 };
 

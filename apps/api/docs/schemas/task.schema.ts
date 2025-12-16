@@ -45,6 +45,29 @@ export const TaskSchema = {
       },
       description: 'User who created the task'
     },
+    assignees: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'User unique identifier'
+          },
+          name: {
+            type: 'string',
+            description: 'User full name'
+          },
+          email: {
+            type: 'string',
+            format: 'email',
+            description: 'User email address'
+          }
+        }
+      },
+      description: 'Users assigned to this task (Many-to-Many relation)'
+    },
     createdAt: {
       type: 'string',
       format: 'date-time',
@@ -208,28 +231,81 @@ export const TaskListResponseSchema = {
 };
 
 
-export const AssignUserRequestSchema = {
+export const AssignUsersToTaskRequestSchema = {
   type: 'object',
-  required: ['userId'],
+  required: ['userIds'],
   properties: {
-    userId: {
-      oneOf: [
-        {
-          type: 'string',
-          format: 'uuid',
-          description: 'User ID to assign'
-        },
-        {
-          type: 'array',
-          items: {
+    userIds: {
+      type: 'array',
+      items: {
+        type: 'string',
+        format: 'uuid'
+      },
+      minItems: 1,
+      description: 'Array of user IDs to assign to the task',
+      example: ['user123', 'user456']
+    }
+  }
+};
+
+export const AssignUsersToTaskResponseDataSchema = {
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+      format: 'uuid',
+      description: 'Task unique identifier',
+      example: 'task456'
+    },
+    title: {
+      type: 'string',
+      description: 'Task title',
+      example: 'Design UI screens'
+    },
+    status: {
+      type: 'string',
+      enum: ['todo', 'doing', 'in_review', 'approved', 'done'],
+      description: 'Task status',
+      example: 'doing'
+    },
+    assignees: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: {
             type: 'string',
-            format: 'uuid'
+            format: 'uuid',
+            description: 'User unique identifier',
+            example: 'user123'
           },
-          description: 'List of User IDs to assign'
+          name: {
+            type: 'string',
+            description: 'User full name',
+            example: 'John Doe'
+          },
+          email: {
+            type: 'string',
+            format: 'email',
+            description: 'User email address',
+            example: 'john@gmail.com'
+          }
         }
-      ],
-      description: 'User ID or list of User IDs to assign to the task',
-      example: 'user-uuid-123 or ["user-uuid-123", "user-uuid-456"]'
+      },
+      description: 'Users assigned to this task'
+    }
+  }
+};
+
+export const AssignUsersToTaskResponseSchema = {
+  type: 'object',
+  properties: {
+    message: {
+      type: 'string',
+      example: 'Users assigned to task successfully'
+    },
+    data: {
+      $ref: '#/components/schemas/AssignUsersToTaskResponseData'
     }
   }
 };

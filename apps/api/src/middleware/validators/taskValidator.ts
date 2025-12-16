@@ -25,14 +25,20 @@ export const taskUpdateValidator = [
 ];
 
 export const assignUserToTaskValidator = [
-  body('userId')
+  body('userIds')
     .notEmpty()
-    .withMessage('Assignee ID is required')
-    .isArray()
-    .withMessage('Assignee ID must be an array')
+    .withMessage('User IDs are required')
+    .isArray({ min: 1 })
+    .withMessage('User IDs must be a non-empty array')
     .custom((value) => {
       if (!Array.isArray(value)) {
-        throw new TypeError('Assignee ID must be an array');
+        throw new TypeError('User IDs must be an array');
+      }
+      if (value.length === 0) {
+        throw new Error('At least one user ID is required');
+      }
+      if (!value.every((id) => typeof id === 'string' && id.trim().length > 0)) {
+        throw new Error('All user IDs must be non-empty strings');
       }
       return true;
     })

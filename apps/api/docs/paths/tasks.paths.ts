@@ -158,7 +158,7 @@ export const taskPaths = {
     patch: {
       tags: ['Tasks'],
       summary: 'Update a task',
-      description: 'Update an existing task',
+      description: 'Update an existing task within a project',
       security: [{ bearerAuth: [] }],
       parameters: [
         {
@@ -217,7 +217,7 @@ export const taskPaths = {
     delete: {
       tags: ['Tasks'],
       summary: 'Delete a task',
-      description: 'Delete a specific task within a project. Only the project creator can delete tasks.',
+      description: 'Delete a specific task within a project.',
       security: [{ bearerAuth: [] }],
       parameters: [
         {
@@ -261,22 +261,6 @@ export const taskPaths = {
         '401': {
           $ref: '#/components/responses/UnauthorizedError'
         },
-        '403': {
-          description: 'Forbidden - User not authorized to delete this task',
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  message: {
-                    type: 'string',
-                    example: 'You are not authorized to delete this task'
-                  }
-                }
-              }
-            }
-          }
-        },
         '404': {
           $ref: '#/components/responses/NotFoundError'
         }
@@ -284,11 +268,13 @@ export const taskPaths = {
     }
   }
   ,
-  '/projects/{projectId}/tasks/{taskId}/assign': {
-    patch: {
+  '/projects/{projectId}/tasks/{taskId}/assignees': {
+    post: {
       tags: ['Tasks'],
-      summary: 'Assign user to a task',
-      description: 'Assign one or multiple users to a task',
+      summary: 'Assign users to a task',
+      description:
+        'Assign one or more users to a task. Assigned users are stored as a Many-to-Many relation. ' +
+        'Duplicate assignments are automatically prevented.',
       security: [{ bearerAuth: [] }],
       parameters: [
         {
@@ -317,40 +303,69 @@ export const taskPaths = {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/AssignUserRequest'
+              $ref: '#/components/schemas/AssignUsersToTaskRequest'
             }
           }
         }
       },
       responses: {
         '200': {
-          description: 'Users assigned successfully',
+          description: 'Users assigned to task successfully',
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/Task'
+                $ref: '#/components/schemas/AssignUsersToTaskResponse'
               }
             }
           }
         },
         '400': {
-          $ref: '#/components/responses/ValidationError'
-        },
-        '401': {
-          $ref: '#/components/responses/UnauthorizedError'
-        },
-        '403': {
-          description: 'Forbidden - User is not the project creator',
+          description: 'Bad Request - Invalid or empty user list',
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/Error'
+                type: 'object',
+                properties: {
+                  message: {
+                    type: 'string',
+                    example: 'Invalid or empty user list'
+                  }
+                }
               }
             }
           }
         },
+        '401': {
+          $ref: '#/components/responses/UnauthorizedError'
+        },
         '404': {
-          $ref: '#/components/responses/NotFoundError'
+          description: 'Not Found - Project, task, or one or more users not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  message: {
+                    type: 'string',
+                    examples: {
+                      project: {
+                        value: 'Project not found'
+                      },
+                      task: {
+                        value: 'Task not found'
+                      },
+                      taskProject: {
+                        value: 'Task does not belong to this project'
+                      },
+                      users: {
+                        value: 'One or more users not found'
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
