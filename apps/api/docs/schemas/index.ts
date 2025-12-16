@@ -4,6 +4,7 @@
 
 import {
   AuthResponseSchema,
+  ListUsersResponseSchema,
   LoginRequestSchema,
   SignupRequestSchema,
   SignupResponseSchema
@@ -48,6 +49,7 @@ export const schemas = {
   LoginRequest: LoginRequestSchema,
   AuthResponse: AuthResponseSchema,
   SignupResponse: SignupResponseSchema,
+  ListUsersResponse: ListUsersResponseSchema,
 
   // Project
   Project: ProjectSchema,

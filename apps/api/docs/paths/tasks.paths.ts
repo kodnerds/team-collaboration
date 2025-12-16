@@ -266,8 +266,7 @@ export const taskPaths = {
         }
       }
     }
-  }
-  ,
+  },
   '/projects/{projectId}/tasks/{taskId}/assignees': {
     post: {
       tags: ['Tasks'],
@@ -371,4 +370,3 @@ export const taskPaths = {
     }
   }
 };
-
