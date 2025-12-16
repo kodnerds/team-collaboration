@@ -33,4 +33,15 @@ export class UserRepository {
     const user = this.repository.create(userData);
     return await this.repository.save(user);
   }
+
+  async findAll(): Promise<UserEntity[]> {
+    return await this.repository.find({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatarUrl: true
+      }
+    });
+  }
 }

@@ -77,3 +77,17 @@ export const signup = async (req: Request, res: Response) => {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
   }
 };
+
+export const listUsers = async (req: Request, res: Response) => {
+  try {
+    const userRepository = new UserRepository();
+    const users = await userRepository.findAll();
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: 'Users fetched successfully',
+      data: users
+    });
+  } catch {
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+  }
+};

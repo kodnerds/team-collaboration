@@ -1,7 +1,9 @@
+import { genToken } from '../../src/utils/tokenJWT';
 import { TestFactory } from '../factory';
 import { createTestUser } from '../utils/helper-function';
 
 import type { UserEntity } from '../../src/entities';
+import type { AuthenticatedUser } from '../../src/types';
 
 describe('POST /auth/login', () => {
   const factory: TestFactory = new TestFactory();
@@ -209,5 +211,62 @@ describe('POST /auth/signup', () => {
     const responseString = JSON.stringify(response.body);
     expect(responseString).not.toContain(password);
     expect(responseString).not.toContain('john@gmail.com');
+  });
+});
+
+describe('GET /users', () => {
+  const factory: TestFactory = new TestFactory();
+  let testUser: UserEntity;
+  let authToken: string;
+
+  beforeAll(async () => {
+    await factory.init();
+  });
+
+  afterAll(async () => {
+    await factory.close();
+  });
+
+  beforeEach(async () => {
+    await factory.reset();
+    testUser = await createTestUser(factory, {
+      name: 'John Doe',
+      email: 'john@example.com'
+    });
+
+    await createTestUser(factory, {
+      name: 'Jane Smith',
+      email: 'jane@example.com'
+    });
+
+    const authenticatedUser: AuthenticatedUser = {
+      id: testUser.id,
+      name: testUser.name,
+      email: testUser.email
+    };
+    authToken = genToken(authenticatedUser);
+  });
+
+  it('should return 200 and list all users', async () => {
+    const response = await factory.app.get('/auth').set('Authorization', `Bearer ${authToken}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('data');
+    expect(response.body.data).toHaveLength(2);
+  });
+
+  it('should return 401 for unauthenticated requests', async () => {
+    const response = await factory.app.get('/auth');
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
+  });
+
+  it('should not return password in response', async () => {
+    const response = await factory.app.get('/auth').set('Authorization', `Bearer ${authToken}`);
+
+    expect(response.status).toBe(200);
+    const responseString = JSON.stringify(response.body);
+    expect(responseString).not.toContain('password');
   });
 });
