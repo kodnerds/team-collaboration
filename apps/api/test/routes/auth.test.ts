@@ -214,7 +214,7 @@ describe('POST /auth/signup', () => {
   });
 });
 
-describe('GET /users', () => {
+describe('GET /auth/users', () => {
   const factory: TestFactory = new TestFactory();
   let testUser: UserEntity;
   let authToken: string;
@@ -248,7 +248,9 @@ describe('GET /users', () => {
   });
 
   it('should return 200 and list all users', async () => {
-    const response = await factory.app.get('/auth').set('Authorization', `Bearer ${authToken}`);
+    const response = await factory.app
+      .get('/auth/users')
+      .set('Authorization', `Bearer ${authToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('data');
@@ -256,7 +258,9 @@ describe('GET /users', () => {
   });
 
   it('Response structure should match the expected shape', async () => {
-    const response = await factory.app.get('/auth').set('Authorization', `Bearer ${authToken}`);
+    const response = await factory.app
+      .get('/auth/users')
+      .set('Authorization', `Bearer ${authToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('data');
@@ -268,14 +272,16 @@ describe('GET /users', () => {
   });
 
   it('should return 401 for unauthenticated requests', async () => {
-    const response = await factory.app.get('/auth');
+    const response = await factory.app.get('/auth/users');
 
     expect(response.status).toBe(401);
     expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
   });
 
   it('should not return password in response', async () => {
-    const response = await factory.app.get('/auth').set('Authorization', `Bearer ${authToken}`);
+    const response = await factory.app
+      .get('/auth/users')
+      .set('Authorization', `Bearer ${authToken}`);
 
     expect(response.status).toBe(200);
     const responseString = JSON.stringify(response.body);
