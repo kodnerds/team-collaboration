@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import type { ProjectMember } from '@/types/kanban';
-import { fetchProjectMembers } from '@/api/projects';
 import { useParams } from 'react-router-dom';
+
+import type { ProjectMember } from '@/api/projects';
+import { fetchProjectMembers } from '@/api/projects';
 
 interface Props {
   taskId: string;
@@ -13,7 +14,7 @@ export const AssignUserDropdown = ({ taskId, onAssign, onClose }: Props) => {
   const { id: projectId } = useParams<{ id: string }>();
 
   const [members, setMembers] = useState<ProjectMember[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export const AssignUserDropdown = ({ taskId, onAssign, onClose }: Props) => {
   }, [projectId]);
 
   const handleAssign = async (member: ProjectMember | null) => {
-    setLoading(true);
+    setIsLoading(true);
     setError('');
 
     try {
@@ -34,7 +35,7 @@ export const AssignUserDropdown = ({ taskId, onAssign, onClose }: Props) => {
     } catch {
       setError('Assignment failed');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -45,18 +46,24 @@ export const AssignUserDropdown = ({ taskId, onAssign, onClose }: Props) => {
       {members.map((m) => (
         <button
           key={m.id}
-          disabled={loading}
+          disabled={isLoading}
           onClick={() => handleAssign(m)}
           className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 w-full text-left"
         >
-          {m.avatar && <img src={m.avatar} className="w-5 h-5 rounded-full" />}
+          {m.avatar && (
+            <img
+              src={m.avatar}
+              alt={m.name}
+              className="w-5 h-5 rounded-full"
+            />
+          )}
           <span className="text-sm">{m.name}</span>
         </button>
       ))}
 
       <button
         onClick={() => handleAssign(null)}
-        disabled={loading}
+        disabled={isLoading}
         className="w-full text-xs text-gray-500 p-2 hover:bg-gray-50"
       >
         Unassign

@@ -92,3 +92,36 @@ export const createProject = async (
 
   return response.json();
 };
+
+export interface ProjectMember {
+  id: string;
+  name: string;
+  email?: string;
+  avatar?: string;
+}
+
+export const fetchProjectMembers = async (
+  projectId: string
+): Promise<ProjectMember[]> => {
+  const base = import.meta.env.VITE_API_URL;
+
+  const response = await fetch(
+    `${base}/projects/${projectId}/members`,
+    {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const error = new Error(
+      errorData?.message || 'Failed to fetch project members'
+    ) as HttpError;
+    error.status = response.status;
+    throw error;
+  }
+
+  const json = await response.json();
+  return json.data; 
+};

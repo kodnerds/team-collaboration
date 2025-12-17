@@ -17,8 +17,6 @@ interface KanbanColumnProps {
   onAssignUser: (taskId: string, user: ProjectMember | null) => Promise<void>;
 }
 
-
-
 export const KanbanColumn = ({
   column,
   tasks,
@@ -27,9 +25,8 @@ export const KanbanColumn = ({
   onDragStart,
   onDragOver,
   onDrop,
-  onAssignUser,
+  onAssignUser
 }: KanbanColumnProps) => (
-
   <div
     className="flex flex-col min-w-[320px] max-w-[320px] bg-gray-50 rounded-xl"
     onDragOver={onDragOver}
@@ -54,15 +51,15 @@ export const KanbanColumn = ({
 
     {/* Tasks List */}
     <div className="flex-1 px-2 pb-2 space-y-2 overflow-y-auto scrollbar-thin max-h-[calc(100vh-280px)]">
-      {tasks.map((task) => (
-<TaskCard
-key={task.id}
-task={task}
-onDelete={onDeleteTask}
-onDragStart={onDragStart}
-onAssignUser={onAssignUser}
-/>
-    ))}
+    {tasks.map((task) => (
+  <TaskCard
+    key={task.id}
+    task={task}
+    onDelete={onDeleteTask}
+    onDragStart={onDragStart}
+    onAssignUser={onAssignUser}
+  />
+))}
     </div>
 
     {/* Add Task Form */}
