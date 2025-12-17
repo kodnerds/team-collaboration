@@ -4,7 +4,8 @@ import {
   Column,
   OneToMany,
   CreateDateColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
+  ManyToMany
 } from 'typeorm';
 
 import { TaskEntity } from './TaskEntity';
@@ -28,6 +29,9 @@ export class UserEntity {
 
   @OneToMany(() => TaskEntity, (task) => task.createdBy)
   tasks: TaskEntity[];
+
+  @ManyToMany(() => TaskEntity, (task) => task.assignees)
+  assignedTasks: TaskEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

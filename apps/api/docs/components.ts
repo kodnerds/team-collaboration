@@ -41,7 +41,7 @@ export const components = {
       content: {
         'application/json': {
           schema: {
-            $ref: '#/components/schemas/Error'
+            $ref: '#/components/schemas/ValidationError'
           }
         }
       }

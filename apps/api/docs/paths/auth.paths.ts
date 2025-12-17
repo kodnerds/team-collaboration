@@ -24,7 +24,7 @@ export const authPaths = {
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/AuthResponse'
+                $ref: '#/components/schemas/SignupResponse'
               }
             }
           }
@@ -83,6 +83,33 @@ export const authPaths = {
               }
             }
           }
+        }
+      }
+    }
+  },
+  '/auth/users': {
+    get: {
+      tags: ['Authentication'],
+      summary: 'List all users',
+      description: 'Retrieve a list of all registered users (requires authentication)',
+      security: [
+        {
+          bearerAuth: []
+        }
+      ],
+      responses: {
+        '200': {
+          description: 'Users fetched successfully',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ListUsersResponse'
+              }
+            }
+          }
+        },
+        '401': {
+          $ref: '#/components/responses/UnauthorizedError'
         }
       }
     }

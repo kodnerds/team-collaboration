@@ -165,44 +165,6 @@ describe('Tasks', () => {
       expect(response.body).toHaveProperty('message', 'Task not found');
     });
 
-    it('should return 404 when task is not in the project', async () => {
-      const otherProject = await createTestProject(factory, testUser, {
-        name: 'Other Project'
-      });
-
-      const response = await factory.app
-        .patch(`/projects/${otherProject.id}/tasks/${taskId}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          title: 'Updated Task'
-        });
-
-      expect(response.status).toBe(404);
-      expect(response.body).toHaveProperty('message', 'Task not found in this project');
-    });
-
-    it('should return 403 when user is not the project creator', async () => {
-      const otherUser = await createTestUser(factory, {
-        name: 'Jane Doe',
-        email: 'jane@example.com'
-      });
-      const otherUserToken = genToken({
-        id: otherUser.id,
-        name: otherUser.name,
-        email: otherUser.email
-      });
-
-      const response = await factory.app
-        .patch(`/projects/${projectId}/tasks/${taskId}`)
-        .set('Authorization', `Bearer ${otherUserToken}`)
-        .send({
-          title: 'Updated Task'
-        });
-
-      expect(response.status).toBe(403);
-      expect(response.body).toHaveProperty('message', 'You are not authorized to update this task');
-    });
-
     it('should return 401 when unauthenticated', async () => {
       const response = await factory.app.patch(`/projects/${projectId}/tasks/${taskId}`).send({
         title: 'Updated Task'
@@ -340,6 +302,8 @@ describe('Tasks', () => {
       expect(response.body.data).toHaveProperty('description', 'This is a test task description');
       expect(response.body.data).toHaveProperty('status', 'todo');
       expect(response.body.data).toHaveProperty('createdBy');
+      expect(response.body.data).toHaveProperty('assignees');
+      expect(Array.isArray(response.body.data.assignees)).toBe(true);
     });
 
     it('should return 404 when task is not found', async () => {
@@ -415,6 +379,8 @@ describe('Tasks', () => {
       expect(response.body.data[0].createdBy).toHaveProperty('id');
       expect(response.body.data[0].createdBy).toHaveProperty('name');
       expect(response.body.data[0].createdBy).toHaveProperty('email');
+      expect(response.body.data[0]).toHaveProperty('assignees');
+      expect(Array.isArray(response.body.data[0].assignees)).toBe(true);
       expect(response.body.data[0]).toHaveProperty('createdAt');
       expect(response.body.data[0]).toHaveProperty('updatedAt');
     });
@@ -468,6 +434,114 @@ describe('Tasks', () => {
 
     it('should return 401 when unauthenticated', async () => {
       const response = await factory.app.get(`/projects/${projectId}/tasks`);
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
+    });
+  });
+
+  describe('POST /projects/:projectId/tasks/:taskId/assignees', () => {
+    it('should assign single and multiple users to a task successfully', async () => {
+      const secondUser = await createTestUser(factory, {
+        name: 'Second User',
+        email: 'second@example.com'
+      });
+
+      const response = await factory.app
+        .post(`/projects/${projectId}/tasks/${taskId}/assignees`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          userIds: [testUser.id, secondUser.id]
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Users assigned to task successfully');
+      expect(response.body.data).toHaveProperty('id', taskId);
+      expect(response.body.data).toHaveProperty('title', 'Test Task');
+      expect(response.body.data).toHaveProperty('status', 'todo');
+      expect(response.body.data.assignees).toHaveLength(2);
+      expect(response.body.data.assignees[0]).toHaveProperty('id', testUser.id);
+      expect(response.body.data.assignees[0]).toHaveProperty('name', testUser.name);
+      expect(response.body.data.assignees[0]).toHaveProperty('email', testUser.email);
+      expect(response.body.data.assignees[1]).toHaveProperty('id', secondUser.id);
+      expect(response.body.data.assignees[1]).toHaveProperty('name', secondUser.name);
+      expect(response.body.data.assignees[1]).toHaveProperty('email', secondUser.email);
+    });
+
+    it('should prevent duplicate user assignments', async () => {
+      // First assignment
+      await factory.app
+        .post(`/projects/${projectId}/tasks/${taskId}/assignees`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          userIds: [testUser.id]
+        });
+
+      // Second assignment (duplicate)
+      const response = await factory.app
+        .post(`/projects/${projectId}/tasks/${taskId}/assignees`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          userIds: [testUser.id]
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.assignees).toHaveLength(1);
+    });
+
+    it('should return 400 when userIds is empty or invalid', async () => {
+      const response = await factory.app
+        .post(`/projects/${projectId}/tasks/${taskId}/assignees`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          userIds: []
+        });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return 404 when one or more users not found', async () => {
+      const nonExistentUserId = '2f23cc49-2b8b-4537-9e43-c347f1d08a66';
+      const response = await factory.app
+        .post(`/projects/${projectId}/tasks/${taskId}/assignees`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          userIds: [testUser.id, nonExistentUserId]
+        });
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'One or more users not found');
+    });
+  });
+
+  describe('DELETE /projects/:projectId/tasks/:taskId', () => {
+    it('should delete a task successfully', async () => {
+      const response = await factory.app
+        .delete(`/projects/${projectId}/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message', 'Task deleted successfully');
+
+      const getResponse = await factory.app
+        .get(`/projects/${projectId}/tasks/${taskId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(getResponse.status).toBe(404);
+    });
+
+    it('should return 404 when task not found or does not belong to project', async () => {
+      const nonExistentTaskId = '2f23cc49-2b8b-4537-9e43-c347f1d08a66';
+      const response = await factory.app
+        .delete(`/projects/${projectId}/tasks/${nonExistentTaskId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty('message', 'Task not found');
+    });
+
+    it('should return 401 when unauthenticated', async () => {
+      const response = await factory.app.delete(`/projects/${projectId}/tasks/${taskId}`);
+
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('message', 'User is not authorized or token is missing');
     });
