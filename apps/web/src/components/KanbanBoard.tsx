@@ -45,21 +45,30 @@ export const KanbanBoard = () => {
   const getTasksByColumn = (columnId: TaskStatus) =>
     tasks?.filter((task) => task.status === columnId);
 
+  // FIXED: Added refetch after creating task
   const handleAddTask = async (title: string, status: TaskStatus) => {
     if (!id) return;
 
     try {
       await createTask(id, title, status);
+      // Refetch tasks to update the board
+      const response = await fetchTasksByProject(id);
+      setTasks(response.data);
+      setError(null);
     } catch (err) {
       const error = err as { message?: string };
       setError(error.message || 'Failed to add task');
     }
   };
 
+  // FIXED: Added projectId parameter
   const handleDeleteTask = async (taskId: string) => {
+    if (!id) return;
+
     try {
-      await deleteTask(taskId);
+      await deleteTask(id, taskId);
       setTasks((prev) => prev.filter((task) => task.id !== taskId));
+      setError(null);
     } catch (err) {
       const error = err as { message?: string };
       setError(error.message || 'Failed to delete task');
@@ -71,15 +80,17 @@ export const KanbanBoard = () => {
     e.dataTransfer.effectAllowed = 'move';
   };
 
+  // FIXED: Added projectId parameter
   const handleDrop = async (e: React.DragEvent, columnId: TaskStatus) => {
     e.preventDefault();
 
-    if (draggedTaskId) {
+    if (draggedTaskId && id) {
       try {
-        await updateTask(draggedTaskId, { status: columnId });
+        await updateTask(id, draggedTaskId, { status: columnId });
         setTasks((prev) =>
           prev.map((task) => (task.id === draggedTaskId ? { ...task, status: columnId } : task))
         );
+        setError(null);
       } catch (err) {
         const error = err as { message?: string };
         setError(error.message || 'Failed to move task');
