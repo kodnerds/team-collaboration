@@ -52,7 +52,7 @@ export const TaskCard = ({ task, onDelete, onDragStart }: TaskCardProps) => {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="p-2 flex items-center justify-center rounded "
           >
-            <MoreHorizontal className="w-4 h-5 text-blue-800" /> 
+            <MoreHorizontal className="w-4 h-5 text-blue-800" />
           </button>
 
           {isMenuOpen && (
