@@ -1,3 +1,5 @@
+import type { User } from '@/types/kanban';
+
 interface HttpError extends Error {
   status: number;
 }
@@ -93,16 +95,20 @@ export const createProject = async (
   return response.json();
 };
 
-export interface ProjectMember {
+interface ProjectMemberApi {
   id: string;
   name: string;
   email?: string;
   avatar?: string;
 }
 
+interface FetchProjectMembersResponse {
+  data: ProjectMemberApi[];
+}
+
 export const fetchProjectMembers = async (
   projectId: string
-): Promise<ProjectMember[]> => {
+): Promise<User[]> => {
   const base = import.meta.env.VITE_API_URL;
 
   const response = await fetch(
@@ -122,6 +128,12 @@ export const fetchProjectMembers = async (
     throw error;
   }
 
-  const json = await response.json();
-  return json.data; 
+  const json: FetchProjectMembersResponse = await response.json();
+
+  return json.data.map((member) => ({
+    id: member.id,
+    name: member.name,
+    email: member.email ?? '',
+    avatarUrl: member.avatar,
+  }));
 };

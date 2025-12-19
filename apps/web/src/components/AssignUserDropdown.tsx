@@ -1,19 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import type { ProjectMember } from '@/api/projects';
+import type { User } from '@/types/kanban';
 import { fetchProjectMembers } from '@/api/projects';
 
 interface Props {
   taskId: string;
-  onAssign: (taskId: string, user: ProjectMember | null) => Promise<void>;
+  assignedUser: User | null;
+  onAssign: (taskId: string, user: User | null) => Promise<void>;
   onClose: () => void;
 }
 
-export const AssignUserDropdown = ({ taskId, onAssign, onClose }: Props) => {
-  const { id: projectId } = useParams<{ id: string }>();
+export const AssignUserDropdown = ({
+  taskId,
+  assignedUser,
+  onAssign,
+  onClose,
+}: Props) => {
+  const params = useParams();
+  const projectId = params.id;
 
-  const [members, setMembers] = useState<ProjectMember[]>([]);
+  const [members, setMembers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -25,46 +32,66 @@ export const AssignUserDropdown = ({ taskId, onAssign, onClose }: Props) => {
       .catch(() => setError('Failed to load members'));
   }, [projectId]);
 
-  const handleAssign = async (member: ProjectMember | null) => {
-    setIsLoading(true);
-    setError('');
+  const handleAssign = useCallback(
+    async (member: User | null) => {
+      setIsLoading(true);
+      setError('');
 
-    try {
-      await onAssign(taskId, member);
-      onClose();
-    } catch {
-      setError('Assignment failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      try {
+        await onAssign(taskId, member);
+        onClose();
+      } catch {
+        setError('Assignment failed');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [onAssign, onClose, taskId]
+  );
 
   return (
-    <div className="absolute z-50 bg-white border rounded-md shadow-md w-48 mt-2">
+    <div className="absolute z-50 bg-white border rounded-md shadow-md w-52 mt-2">
       {error && <p className="text-xs text-red-500 p-2">{error}</p>}
 
-      {members.map((m) => (
-        <button
-          key={m.id}
-          disabled={isLoading}
-          onClick={() => handleAssign(m)}
-          className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 w-full text-left"
-        >
-          {m.avatar && (
-            <img
-              src={m.avatar}
-              alt={m.name}
-              className="w-5 h-5 rounded-full"
-            />
-          )}
-          <span className="text-sm">{m.name}</span>
-        </button>
-      ))}
+      {members.map((member) => {
+        const isAssigned = assignedUser?.id === member.id;
+
+        return (
+          <button
+            key={member.id}
+            disabled={isLoading || isAssigned}
+            onClick={() => handleAssign(member)}
+            className={`flex items-center gap-2 px-3 py-2 w-full text-left
+              ${isAssigned ? 'bg-blue-50 cursor-not-allowed' : 'hover:bg-gray-100'}
+            `}
+          >
+            {member.avatarUrl ? (
+              <img
+                src={member.avatarUrl}
+                alt={member.name}
+                className="w-5 h-5 rounded-full"
+              />
+            ) : (
+              <div className="w-5 h-5 rounded-full bg-gray-300 text-xs flex items-center justify-center">
+                {member.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            <span className="text-sm flex-1">{member.name}</span>
+
+            {isAssigned && (
+              <span className="text-[10px] text-blue-600 font-medium">
+                Assigned
+              </span>
+            )}
+          </button>
+        );
+      })}
 
       <button
         onClick={() => handleAssign(null)}
-        disabled={isLoading}
-        className="w-full text-xs text-gray-500 p-2 hover:bg-gray-50"
+        disabled={isLoading || !assignedUser}
+        className="w-full text-xs text-gray-500 p-2 hover:bg-gray-50 disabled:opacity-50"
       >
         Unassign
       </button>

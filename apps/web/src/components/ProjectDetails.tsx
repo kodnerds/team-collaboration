@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
-import { type Project } from '../api/projects';
+
 import { getProjectById } from '../utils/api';
+import type { Project } from '../api/projects';
 
 const ProjectDetails = () => {
   const { id } = useParams();

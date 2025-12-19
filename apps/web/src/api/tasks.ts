@@ -4,6 +4,26 @@ import { getAuthHeaders } from '@/api/projects.ts';
 
 const base = import.meta.env.VITE_API_URL;
 
+interface HttpError extends Error {
+  status: number;
+}
+
+const extractError = async (
+  response: Response,
+  fallbackMessage: string
+): Promise<never> => {
+  const errorData = await response.json().catch(() => ({}));
+
+  const error = new Error(
+    errorData?.message ||
+    errorData?.error ||
+    fallbackMessage
+  ) as HttpError;
+
+  error.status = response.status;
+  throw error;
+};
+
 export interface ProjectsResponse {
   message: string;
   data: Task[];
@@ -36,7 +56,7 @@ export const fetchTasksByProject = async (projectId: string): Promise<ProjectsRe
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch tasks: ${response.statusText}`);
+    await extractError(response, 'Failed to fetch tasks');
   }
 
   return response.json();
@@ -60,8 +80,8 @@ export const createTask = async (
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to create task: ${response.statusText}`);
-  }
+    await extractError(response, 'Failed to create task');
+  }  
 
   return response.json();
 };
@@ -77,9 +97,8 @@ export const updateTask = async (
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to update task: ${response.statusText}`);
-  }
-
+    await extractError(response, 'Failed to update task');
+  }  
   return response.json();
 };
 
@@ -90,7 +109,7 @@ export const deleteTask = async (taskId: string): Promise<boolean> => {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to delete task: ${response.statusText}`);
+    await extractError(response, 'Failed to delete task');
   }
 
   return true;
@@ -103,13 +122,14 @@ export const assignUserToTask = async (
   const response = await fetch(`${base}/tasks/${taskId}`, {
     method: 'PATCH',
     headers: getAuthHeaders(),
-    body: JSON.stringify({ assignedUserId })
+    body: JSON.stringify({ assignedUserId }),
   });
 
   if (!response.ok) {
-    throw new Error('Failed to assign user');
+    await extractError(response, 'Failed to assign user');
   }
 
   return response.json();
 };
+
 

@@ -2,15 +2,7 @@ import { AlertCircle, LayoutGrid } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { KanbanColumn } from './KanbanColumn';
-
-import type {
-  Column,
-  ProjectMember,
-  Task,
-  TaskStatus,
-} from '@/types/kanban';
-
+import type { Column, Task, TaskStatus, User } from '@/types/kanban';
 import { COLUMNS } from '@/types/kanban';
 
 import {
@@ -20,6 +12,8 @@ import {
   fetchTasksByProject,
   updateTask,
 } from '@/api/tasks';
+
+import { KanbanColumn } from './KanbanColumn';
 
 const handleDragOver = (e: React.DragEvent) => {
   e.preventDefault();
@@ -116,8 +110,8 @@ export const KanbanBoard = () => {
 
   const handleAssignUser = async (
     taskId: string,
-    user: ProjectMember | null
-  ) => {
+    user: User | null
+  ) => {  
     try {
       const response = await assignUserToTask(
         taskId,
