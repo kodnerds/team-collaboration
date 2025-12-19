@@ -35,22 +35,31 @@ export const ErrorSchema = {
       type: 'string',
       description: 'Error message',
       example: 'An error occurred'
+    }
+  }
+};
+
+export const ValidationErrorSchema = {
+  type: 'object',
+  properties: {
+    status: {
+      type: 'string',
+      enum: ['error'],
+      description: 'Error status indicator',
+      example: 'error'
+    },
+    message: {
+      type: 'string',
+      description: 'Error message',
+      example: 'Validation error'
     },
     errors: {
       type: 'array',
       items: {
-        type: 'object',
-        properties: {
-          field: {
-            type: 'string',
-            example: 'email'
-          },
-          message: {
-            type: 'string',
-            example: 'Invalid email format'
-          }
-        }
-      }
+        type: 'string'
+      },
+      description: 'Array of validation error messages',
+      example: ['Email is required', 'Password must be at least 6 characters']
     }
   }
 };

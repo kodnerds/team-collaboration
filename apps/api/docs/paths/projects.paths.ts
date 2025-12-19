@@ -25,7 +25,7 @@ export const projectPaths = {
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/Project'
+                $ref: '#/components/schemas/ProjectCreateResponse'
               }
             }
           }
@@ -104,7 +104,7 @@ export const projectPaths = {
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/Project'
+                $ref: '#/components/schemas/ProjectResponse'
               }
             }
           }
@@ -150,7 +150,7 @@ export const projectPaths = {
           content: {
             'application/json': {
               schema: {
-                $ref: '#/components/schemas/Project'
+                $ref: '#/components/schemas/ProjectResponse'
               }
             }
           }

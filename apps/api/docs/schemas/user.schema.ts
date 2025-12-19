@@ -35,6 +35,23 @@ export const UserSchema = {
       format: 'date-time',
       description: 'Last update timestamp'
     }
-  }
+  },
+  description: 'User object with full details (password excluded)'
+};
+
+export const UserMinimalSchema = {
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+      format: 'uuid',
+      description: 'Unique identifier'
+    },
+    name: {
+      type: 'string',
+      description: 'User full name'
+    }
+  },
+  description: 'Minimal user object (only id and name)'
 };
 
