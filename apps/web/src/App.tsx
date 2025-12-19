@@ -11,8 +11,6 @@ const App = () => (
   <Routes>
     <Route path="/" element={<Navigate to="/login" />} />
     <Route path="/login" element={<Login />} />
-    <Route path="/dashboard" element={<div>Dashboard Placeholder</div>} />
-    <Route path="/tasks" element={<KanbanBoard />} />
     <Route path="/create-project" element={<CreateProject />} />
     <Route path="/projects" element={<ProjectsList />} />
     <Route path="/projects/:id" element={<KanbanBoard />} />

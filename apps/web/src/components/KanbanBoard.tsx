@@ -62,18 +62,20 @@ export const KanbanBoard = () => {
   };
 
   // FIXED: Added projectId parameter
-  const handleDeleteTask = async (taskId: string) => {
-    if (!id) return;
+ const handleDeleteTask = async (taskId: string) => {
+  if (!id) return;
 
-    try {
-      await deleteTask(id, taskId);
-      setTasks((prev) => prev.filter((task) => task.id !== taskId));
-      setError(null);
-    } catch (err) {
-      const error = err as { message?: string };
-      setError(error.message || 'Failed to delete task');
-    }
-  };
+  try {
+    await deleteTask(id, taskId);
+    const response = await fetchTasksByProject(id);
+    setTasks(response.data);
+    setError(null);
+  } catch (err) {
+    const error = err as { message?: string };
+    setError(error.message || 'Failed to delete task');
+  }
+};
+
 
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
     setDraggedTaskId(taskId);
