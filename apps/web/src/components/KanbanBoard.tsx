@@ -20,7 +20,6 @@ export const KanbanBoard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,26 +77,25 @@ export const KanbanBoard = () => {
 
 
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
-    setDraggedTaskId(taskId);
     e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('taskId', taskId);
   };
 
   // FIXED: Added projectId parameter
   const handleDrop = async (e: React.DragEvent, columnId: TaskStatus) => {
     e.preventDefault();
 
+    const draggedTaskId = e.dataTransfer.getData('taskId');
+
     if (draggedTaskId && id) {
       try {
         await updateTask(id, draggedTaskId, { status: columnId });
-        setTasks((prev) =>
-          prev.map((task) => (task.id === draggedTaskId ? { ...task, status: columnId } : task))
-        );
+        const response = await fetchTasksByProject(id);
+        setTasks(response.data);
         setError(null);
       } catch (err) {
         const error = err as { message?: string };
         setError(error.message || 'Failed to move task');
-      } finally {
-        setDraggedTaskId(null);
       }
     }
   };
