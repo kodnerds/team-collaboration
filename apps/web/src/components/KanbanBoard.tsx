@@ -75,13 +75,10 @@ export const KanbanBoard = () => {
     }
   };
 
-  const handleDragStart = (
-  e: React.DragEvent,
-  taskId: string
-) => {
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('taskId', taskId);
-};
+  const handleDragStart = (e: React.DragEvent, taskId: string) => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('taskId', taskId);
+  };
 
   // FIXED: Added projectId parameter
   const handleDrop = async (e: React.DragEvent, columnId: TaskStatus) => {
