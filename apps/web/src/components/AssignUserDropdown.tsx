@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import type { User } from '@/types/kanban';
+
 import { fetchProjectMembers } from '@/api/projects';
 
 interface Props {

@@ -2,8 +2,9 @@ import { AlertCircle, LayoutGrid } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { KanbanColumn } from './KanbanColumn';
+
 import type { Column, Task, TaskStatus, User } from '@/types/kanban';
-import { COLUMNS } from '@/types/kanban';
 
 import {
   assignUserToTask,
@@ -12,8 +13,9 @@ import {
   fetchTasksByProject,
   updateTask,
 } from '@/api/tasks';
+import { COLUMNS } from '@/types/kanban';
 
-import { KanbanColumn } from './KanbanColumn';
+
 
 const handleDragOver = (e: React.DragEvent) => {
   e.preventDefault();

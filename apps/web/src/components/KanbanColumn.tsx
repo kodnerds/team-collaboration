@@ -4,7 +4,7 @@ import { AddTaskForm } from './AddTaskForm';
 import { StatusIndicator } from './StatusIndicator';
 import { TaskCard } from './TaskCard';
 
-import type { Column, Task, TaskStatus, ProjectMember } from '@/types/kanban';
+import type { Column, Task, TaskStatus, User } from '@/types/kanban';
 
 interface KanbanColumnProps {
   column: Column;
@@ -14,7 +14,7 @@ interface KanbanColumnProps {
   onDragStart: (e: React.DragEvent, taskId: string) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, columnId: TaskStatus) => void;
-  onAssignUser: (taskId: string, user: ProjectMember | null) => Promise<void>;
+  onAssignUser: (taskId: string, user: User | null) => Promise<void>;
 }
 
 export const KanbanColumn = ({

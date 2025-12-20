@@ -3,13 +3,13 @@ import { useState, useRef, useEffect } from 'react';
 
 import { StatusIndicator } from './StatusIndicator';
 
-import type { ProjectMember, Task } from '@/types/kanban';
+import type { User, Task } from '@/types/kanban';
 
 interface TaskCardProps {
   task: Task;
   onDelete: (taskId: string) => void;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
-  onAssignUser: (taskId: string, user: ProjectMember | null) => Promise<void>;
+  onAssignUser: (taskId: string, user: User | null) => Promise<void>;
 }
 
 export const TaskCard = ({

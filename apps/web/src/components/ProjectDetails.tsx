@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 
 
 import { getProjectById } from '../utils/api';
+
 import type { Project } from '../api/projects';
 
 const ProjectDetails = () => {
