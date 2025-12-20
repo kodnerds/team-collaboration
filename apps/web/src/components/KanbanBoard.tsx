@@ -6,12 +6,7 @@ import { KanbanColumn } from './KanbanColumn';
 
 import type { TaskStatus, Column, Task } from '@/types/kanban';
 
-import {
-  fetchTasksByProject,
-  createTask,
-  updateTask,
-  deleteTask,
-} from '@/api/tasks';
+import { fetchTasksByProject, createTask, updateTask, deleteTask } from '@/api/tasks';
 import { COLUMNS } from '@/types/kanban';
 
 /* =========================
@@ -23,10 +18,7 @@ const handleDragOver = (e: React.DragEvent) => {
   e.dataTransfer.dropEffect = 'move';
 };
 
-const handleDragStart = (
-  e: React.DragEvent,
-  taskId: string
-) => {
+const handleDragStart = (e: React.DragEvent, taskId: string) => {
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('taskId', taskId);
 };
@@ -128,9 +120,7 @@ export const KanbanBoard = () => {
       <header className="flex items-center px-6 py-4 border-b border-gray-200 bg-white">
         <div className="flex items-center gap-3">
           <LayoutGrid className="w-5 h-5 text-blue-600" />
-          <h1 className="text-lg font-semibold text-gray-900">
-            Project Board
-          </h1>
+          <h1 className="text-lg font-semibold text-gray-900">Project Board</h1>
         </div>
       </header>
 
@@ -151,9 +141,7 @@ export const KanbanBoard = () => {
               key={column.id}
               column={column}
               tasks={getTasksByColumn(column.id)}
-              onAddTask={(title) =>
-                handleAddTask(title, column.id)
-              }
+              onAddTask={(title) => handleAddTask(title, column.id)}
               onDeleteTask={handleDeleteTask}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
