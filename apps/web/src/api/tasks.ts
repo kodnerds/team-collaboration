@@ -66,12 +66,14 @@ export const createTask = async (
   return response.json();
 };
 
+// FIXED: Changed to PATCH and added projectId to URL
 export const updateTask = async (
+  projectId: string,
   taskId: string,
   updates: Partial<Task>
 ): Promise<{ data: Task }> => {
-  const response = await fetch(`${base}/tasks/${taskId}`, {
-    method: 'PUT',
+  const response = await fetch(`${base}/projects/${projectId}/tasks/${taskId}`, {
+    method: 'PATCH',
     headers: getAuthHeaders(),
     body: JSON.stringify(updates)
   });
@@ -83,8 +85,9 @@ export const updateTask = async (
   return response.json();
 };
 
-export const deleteTask = async (taskId: string): Promise<boolean> => {
-  const response = await fetch(`${base}/tasks/${taskId}`, {
+// FIXED: Added projectId to URL
+export const deleteTask = async (projectId: string, taskId: string): Promise<boolean> => {
+  const response = await fetch(`${base}/projects/${projectId}/tasks/${taskId}`, {
     method: 'DELETE',
     headers: getAuthHeaders()
   });

@@ -18,6 +18,7 @@ export const AddTaskForm = ({ columnId, onAdd }: AddTaskFormProps) => {
     if (title.trim()) {
       onAdd(title.trim(), columnId);
       setTitle('');
+      setDescription('');
       setIsOpen(false);
     }
   };

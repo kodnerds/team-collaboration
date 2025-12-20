@@ -9,10 +9,23 @@ import type { TaskStatus, Column, Task } from '@/types/kanban';
 import { fetchTasksByProject, createTask, updateTask, deleteTask } from '@/api/tasks';
 import { COLUMNS } from '@/types/kanban';
 
+/* =========================
+   Drag helpers (OUTER SCOPE)
+   ========================= */
+
 const handleDragOver = (e: React.DragEvent) => {
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
 };
+
+const handleDragStart = (e: React.DragEvent, taskId: string) => {
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('taskId', taskId);
+};
+
+/* =========================
+   Component
+   ========================= */
 
 export const KanbanBoard = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,7 +33,6 @@ export const KanbanBoard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,6 +40,7 @@ export const KanbanBoard = () => {
 
       setIsLoading(true);
       setError(null);
+
       try {
         const response = await fetchTasksByProject(id);
         setTasks(response.data);
@@ -43,13 +56,16 @@ export const KanbanBoard = () => {
   }, [id]);
 
   const getTasksByColumn = (columnId: TaskStatus) =>
-    tasks?.filter((task) => task.status === columnId);
+    tasks.filter((task) => task.status === columnId);
 
   const handleAddTask = async (title: string, status: TaskStatus) => {
     if (!id) return;
 
     try {
       await createTask(id, title, status);
+      const response = await fetchTasksByProject(id);
+      setTasks(response.data);
+      setError(null);
     } catch (err) {
       const error = err as { message?: string };
       setError(error.message || 'Failed to add task');
@@ -57,34 +73,33 @@ export const KanbanBoard = () => {
   };
 
   const handleDeleteTask = async (taskId: string) => {
+    if (!id) return;
+
     try {
-      await deleteTask(taskId);
-      setTasks((prev) => prev.filter((task) => task.id !== taskId));
+      await deleteTask(id, taskId);
+      const response = await fetchTasksByProject(id);
+      setTasks(response.data);
+      setError(null);
     } catch (err) {
       const error = err as { message?: string };
       setError(error.message || 'Failed to delete task');
     }
   };
 
-  const handleDragStart = (e: React.DragEvent, taskId: string) => {
-    setDraggedTaskId(taskId);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
   const handleDrop = async (e: React.DragEvent, columnId: TaskStatus) => {
     e.preventDefault();
 
-    if (draggedTaskId) {
+    const draggedTaskId = e.dataTransfer.getData('taskId');
+
+    if (draggedTaskId && id) {
       try {
-        await updateTask(draggedTaskId, { status: columnId });
-        setTasks((prev) =>
-          prev.map((task) => (task.id === draggedTaskId ? { ...task, status: columnId } : task))
-        );
+        await updateTask(id, draggedTaskId, { status: columnId });
+        const response = await fetchTasksByProject(id);
+        setTasks(response.data);
+        setError(null);
       } catch (err) {
         const error = err as { message?: string };
         setError(error.message || 'Failed to move task');
-      } finally {
-        setDraggedTaskId(null);
       }
     }
   };
@@ -93,7 +108,7 @@ export const KanbanBoard = () => {
     return (
       <div className="flex items-center justify-center h-screen bg-white">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading tasks...</p>
         </div>
       </div>
@@ -102,7 +117,6 @@ export const KanbanBoard = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      {/* Header */}
       <header className="flex items-center px-6 py-4 border-b border-gray-200 bg-white">
         <div className="flex items-center gap-3">
           <LayoutGrid className="w-5 h-5 text-blue-600" />
@@ -110,7 +124,6 @@ export const KanbanBoard = () => {
         </div>
       </header>
 
-      {/* Error message */}
       {error && (
         <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -121,7 +134,6 @@ export const KanbanBoard = () => {
         </div>
       )}
 
-      {/* Board */}
       <div className="flex-1 overflow-x-auto p-6">
         <div className="flex gap-4 h-full">
           {COLUMNS.map((column: Column) => (
