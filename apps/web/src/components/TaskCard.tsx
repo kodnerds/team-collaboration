@@ -66,10 +66,10 @@ export const TaskCard = ({
 
         <div className="relative" ref={menuRef}>
           <button
-            onClick={() => setIsMenuOpen((v) => !v)}
-            className="h-6 w-6 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 hover:bg-gray-100"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 flex items-center justify-center rounded "
           >
-            <MoreHorizontal className="w-4 h-4" />
+            <MoreHorizontal className="w-4 h-5 text-blue-800" />
           </button>
 
           {isMenuOpen && (

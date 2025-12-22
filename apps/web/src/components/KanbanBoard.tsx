@@ -15,12 +15,23 @@ import {
 } from '@/api/tasks';
 import { COLUMNS } from '@/types/kanban';
 
-
+/* =========================
+   Drag helpers (OUTER SCOPE)
+   ========================= */
 
 const handleDragOver = (e: React.DragEvent) => {
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
 };
+
+const handleDragStart = (e: React.DragEvent, taskId: string) => {
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('taskId', taskId);
+};
+
+/* =========================
+   Component
+   ========================= */
 
 export const KanbanBoard = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,7 +39,6 @@ export const KanbanBoard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,77 +70,44 @@ export const KanbanBoard = () => {
 
     try {
       await createTask(id, title, status);
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to add task';
-      setError(message);
+      const response = await fetchTasksByProject(id);
+      setTasks(response.data);
+      setError(null);
+    } catch (err) {
+      const error = err as { message?: string };
+      setError(error.message || 'Failed to add task');
     }
   };
 
   const handleDeleteTask = async (taskId: string) => {
+    if (!id) return;
+
     try {
-      await deleteTask(taskId);
-      setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to delete task';
-      setError(message);
+      await deleteTask(id, taskId);
+      const response = await fetchTasksByProject(id);
+      setTasks(response.data);
+      setError(null);
+    } catch (err) {
+      const error = err as { message?: string };
+      setError(error.message || 'Failed to delete task');
     }
   };
 
-  const handleDragStart = (e: React.DragEvent, taskId: string) => {
-    setDraggedTaskId(taskId);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDrop = async (
-    e: React.DragEvent,
-    columnId: TaskStatus
-  ) => {
+  const handleDrop = async (e: React.DragEvent, columnId: TaskStatus) => {
     e.preventDefault();
 
-    if (!draggedTaskId) return;
+    const draggedTaskId = e.dataTransfer.getData('taskId');
 
-    try {
-      await updateTask(draggedTaskId, { status: columnId });
-
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === draggedTaskId
-            ? { ...task, status: columnId }
-            : task
-        )
-      );
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to move task';
-      setError(message);
-    } finally {
-      setDraggedTaskId(null);
-    }
-  };
-
-  const handleAssignUser = async (
-    taskId: string,
-    user: User | null
-  ) => {  
-    try {
-      const response = await assignUserToTask(
-        taskId,
-        user ? user.id : null
-      );
-
-      const updatedTask: Task = response.data;
-
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === updatedTask.id ? updatedTask : task
-        )
-      );
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to assign user';
-      setError(message);
+    if (draggedTaskId && id) {
+      try {
+        await updateTask(id, draggedTaskId, { status: columnId });
+        const response = await fetchTasksByProject(id);
+        setTasks(response.data);
+        setError(null);
+      } catch (err) {
+        const error = err as { message?: string };
+        setError(error.message || 'Failed to move task');
+      }
     }
   };
 
@@ -147,9 +124,11 @@ export const KanbanBoard = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <header className="flex items-center px-6 py-4 border-b">
-        <LayoutGrid className="w-5 h-5 text-blue-600 mr-2" />
-        <h1 className="text-lg font-semibold">Project Board</h1>
+      <header className="flex items-center px-6 py-4 border-b border-gray-200 bg-white">
+        <div className="flex items-center gap-3">
+          <LayoutGrid className="w-5 h-5 text-blue-600" />
+          <h1 className="text-lg font-semibold text-gray-900">Project Board</h1>
+        </div>
       </header>
 
       {error && (
