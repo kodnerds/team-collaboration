@@ -12,28 +12,19 @@ interface TaskCardProps {
   onAssignUser: (taskId: string, user: User | null) => Promise<void>;
 }
 
-export const TaskCard = ({
-  task,
-  onDelete,
-  onDragStart,
-  onAssignUser,
-}: TaskCardProps) => {
+export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser }: TaskCardProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node)
-      ) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () =>
-      document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
@@ -48,19 +39,13 @@ export const TaskCard = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <StatusIndicator status={task.status} className="w-2.5 h-2.5" />
-            <span className="text-xs text-gray-500 font-medium">
-              #{task.id.slice(-4)}
-            </span>
+            <span className="text-xs text-gray-500 font-medium">#{task.id.slice(-4)}</span>
           </div>
 
-          <h4 className="text-sm font-medium text-gray-900">
-            {task.title}
-          </h4>
+          <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
 
           {task.description && (
-            <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-              {task.description}
-            </p>
+            <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task.description}</p>
           )}
         </div>
 

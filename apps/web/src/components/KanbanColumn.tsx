@@ -51,15 +51,15 @@ export const KanbanColumn = ({
 
     {/* Tasks List */}
     <div className="flex-1 px-2 pb-2 space-y-2 overflow-y-auto scrollbar-thin max-h-[calc(100vh-280px)]">
-    {tasks.map((task) => (
-  <TaskCard
-    key={task.id}
-    task={task}
-    onDelete={onDeleteTask}
-    onDragStart={onDragStart}
-    onAssignUser={onAssignUser}
-  />
-))}
+      {tasks.map((task) => (
+        <TaskCard
+          key={task.id}
+          task={task}
+          onDelete={onDeleteTask}
+          onDragStart={onDragStart}
+          onAssignUser={onAssignUser}
+        />
+      ))}
     </div>
 
     {/* Add Task Form */}

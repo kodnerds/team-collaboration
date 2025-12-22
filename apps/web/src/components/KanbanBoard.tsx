@@ -11,7 +11,7 @@ import {
   createTask,
   deleteTask,
   fetchTasksByProject,
-  updateTask,
+  updateTask
 } from '@/api/tasks';
 import { COLUMNS } from '@/types/kanban';
 
@@ -43,8 +43,7 @@ export const KanbanBoard = () => {
         const response = await fetchTasksByProject(id);
         setTasks(response.data);
       } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : 'Failed to load tasks';
+        const message = err instanceof Error ? err.message : 'Failed to load tasks';
         setError(message);
       } finally {
         setIsLoading(false);
@@ -105,7 +104,7 @@ export const KanbanBoard = () => {
 
   const handleAssignUser = async (taskId: string, user: User | null) => {
     if (!id) return;
-  
+
     try {
       await assignUserToTask(taskId, user ? user.id : null);
       const response = await fetchTasksByProject(id);

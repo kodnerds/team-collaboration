@@ -51,13 +51,7 @@ export const AssignUserDropdown = ({ taskId, onAssign, onClose }: Props) => {
           onClick={() => handleAssign(m)}
           className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 w-full text-left"
         >
-          {m.avatarUrl && (
-            <img
-              src={m.avatarUrl}
-              alt={m.name}
-              className="w-5 h-5 rounded-full"
-            />
-          )}
+          {m.avatarUrl && <img src={m.avatarUrl} alt={m.name} className="w-5 h-5 rounded-full" />}
           <span className="text-sm">{m.name}</span>
         </button>
       ))}

@@ -8,17 +8,10 @@ interface HttpError extends Error {
   status: number;
 }
 
-const extractError = async (
-  response: Response,
-  fallbackMessage: string
-): Promise<never> => {
+const extractError = async (response: Response, fallbackMessage: string): Promise<never> => {
   const errorData = await response.json().catch(() => ({}));
 
-  const error = new Error(
-    errorData?.message ||
-    errorData?.error ||
-    fallbackMessage
-  ) as HttpError;
+  const error = new Error(errorData?.message || errorData?.error || fallbackMessage) as HttpError;
 
   error.status = response.status;
   throw error;
@@ -81,7 +74,7 @@ export const createTask = async (
 
   if (!response.ok) {
     await extractError(response, 'Failed to create task');
-  }  
+  }
 
   return response.json();
 };
@@ -100,7 +93,7 @@ export const updateTask = async (
 
   if (!response.ok) {
     await extractError(response, 'Failed to update task');
-  }  
+  }
   return response.json();
 };
 
@@ -125,7 +118,7 @@ export const assignUserToTask = async (
   const response = await fetch(`${base}/tasks/${taskId}`, {
     method: 'PATCH',
     headers: getAuthHeaders(),
-    body: JSON.stringify({ assignedUserId }),
+    body: JSON.stringify({ assignedUserId })
   });
 
   if (!response.ok) {
@@ -134,5 +127,3 @@ export const assignUserToTask = async (
 
   return response.json();
 };
-
-
