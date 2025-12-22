@@ -1,5 +1,3 @@
-import type { User } from '@/types/kanban';
-
 interface HttpError extends Error {
   status: number;
 }
@@ -39,6 +37,13 @@ export interface CreateProjectResponse {
       email: string;
     };
   };
+}
+
+export interface ProjectMember {
+  id: string;
+  name: string;
+  email?: string;
+  avatarUrl?: string;
 }
 
 export const getAuthHeaders = () => {
@@ -95,45 +100,25 @@ export const createProject = async (
   return response.json();
 };
 
-interface ProjectMemberApi {
-  id: string;
-  name: string;
-  email?: string;
-  avatar?: string;
-}
-
-interface FetchProjectMembersResponse {
-  data: ProjectMemberApi[];
-}
-
-export const fetchProjectMembers = async (
-  projectId: string
-): Promise<User[]> => {
+export const fetchProjectMembers = async (projectId: string): Promise<ProjectMember[]> => {
   const base = import.meta.env.VITE_API_URL;
-
-  const response = await fetch(
-    `${base}/projects/${projectId}/members`,
-    {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    }
-  );
+  const response = await fetch(`${base}/projects/${projectId}/members`, {
+    method: 'GET',
+    headers: getAuthHeaders()
+  });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const error = new Error(
-      errorData?.message || 'Failed to fetch project members'
-    ) as HttpError;
+    const error = new Error(errorData?.message || 'Failed to fetch project members') as HttpError;
     error.status = response.status;
     throw error;
   }
 
-  const json: FetchProjectMembersResponse = await response.json();
+  const data = await response.json().catch(() => ({}));
 
-  return json.data.map((member) => ({
-    id: member.id,
-    name: member.name,
-    email: member.email ?? '',
-    avatarUrl: member.avatar,
-  }));
+  if (Array.isArray(data?.data?.members)) return data.data.members as ProjectMember[];
+  if (Array.isArray(data?.members)) return data.members as ProjectMember[];
+  if (Array.isArray(data)) return data as ProjectMember[];
+
+  return [];
 };

@@ -2,10 +2,6 @@ import { AlertCircle, LayoutGrid } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { KanbanColumn } from './KanbanColumn';
-
-import type { Column, Task, TaskStatus, User } from '@/types/kanban';
-
 import {
   assignUserToTask,
   createTask,
@@ -13,7 +9,10 @@ import {
   fetchTasksByProject,
   updateTask,
 } from '@/api/tasks';
+import type { Column, Task, TaskStatus, User } from '@/types/kanban';
 import { COLUMNS } from '@/types/kanban';
+
+import { KanbanColumn } from './KanbanColumn';
 
 /* =========================
    Drag helpers (OUTER SCOPE)
@@ -111,6 +110,20 @@ export const KanbanBoard = () => {
     }
   };
 
+  const handleAssignUser = async (taskId: string, user: User | null) => {
+    if (!id) return;
+  
+    try {
+      await assignUserToTask(taskId, user ? user.id : null);
+      const response = await fetchTasksByProject(id);
+      setTasks(response.data);
+      setError(null);
+    } catch (err) {
+      const error = err as { message?: string };
+      setError(error.message || 'Failed to assign user');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-white">
@@ -145,9 +158,7 @@ export const KanbanBoard = () => {
               key={column.id}
               column={column}
               tasks={getTasksByColumn(column.id)}
-              onAddTask={(title) =>
-                handleAddTask(title, column.id)
-              }
+              onAddTask={(title) => handleAddTask(title, column.id)}
               onDeleteTask={handleDeleteTask}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
