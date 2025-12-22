@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { fetchProjectMembers } from '@/api/projects';
 import type { ProjectMember } from '@/api/projects';
+
+import { fetchProjectMembers } from '@/api/projects';
 
 interface Props {
   taskId: string;

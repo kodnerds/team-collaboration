@@ -2,6 +2,10 @@ import { AlertCircle, LayoutGrid } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { KanbanColumn } from './KanbanColumn';
+
+import type { Column, Task, TaskStatus, User } from '@/types/kanban';
+
 import {
   assignUserToTask,
   createTask,
@@ -9,14 +13,7 @@ import {
   fetchTasksByProject,
   updateTask,
 } from '@/api/tasks';
-import type { Column, Task, TaskStatus, User } from '@/types/kanban';
 import { COLUMNS } from '@/types/kanban';
-
-import { KanbanColumn } from './KanbanColumn';
-
-/* =========================
-   Drag helpers (OUTER SCOPE)
-   ========================= */
 
 const handleDragOver = (e: React.DragEvent) => {
   e.preventDefault();
@@ -27,10 +24,6 @@ const handleDragStart = (e: React.DragEvent, taskId: string) => {
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('taskId', taskId);
 };
-
-/* =========================
-   Component
-   ========================= */
 
 export const KanbanBoard = () => {
   const { id } = useParams<{ id: string }>();
