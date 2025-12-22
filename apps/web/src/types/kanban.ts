@@ -11,10 +11,12 @@ export interface Task {
   title: string;
   description?: string;
   status: TaskStatus;
-  createdBy: CreatedBy;
-  assignedUser?: User | null;
-  createdAt: string;
-  updatedAt: string;
+  assignedTo?: {
+    id: string;
+    name: string;
+    email?: string;
+    avatarUrl?: string;
+  } | null;
 }
 
 export interface Column {

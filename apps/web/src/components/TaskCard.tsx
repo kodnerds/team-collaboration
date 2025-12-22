@@ -1,25 +1,31 @@
-import { MoreHorizontal, GripVertical, Trash2 } from 'lucide-react';
+import { MoreHorizontal, GripVertical, Trash2, UserPlus } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
+import { AssignUserDropdown } from './AssignUserDropdown';
 import { StatusIndicator } from './StatusIndicator';
 
-import type { User, Task } from '@/types/kanban';
+import type { Task } from '@/types/kanban';
 
 interface TaskCardProps {
   task: Task;
   onDelete: (taskId: string) => void;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
-  onAssignUser: (taskId: string, user: User | null) => Promise<void>;
+  onAssignUser: (taskId: string, userId: string | null) => Promise<void>;
 }
 
 export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser }: TaskCardProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAssignDropdownOpen, setIsAssignDropdownOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const assignRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
+      }
+      if (assignRef.current && !assignRef.current.contains(event.target as Node)) {
+        setIsAssignDropdownOpen(false);
       }
     };
 
@@ -47,18 +53,60 @@ export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser }: TaskCard
           {task.description && (
             <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task.description}</p>
           )}
+
+          {/* Assigned User Display */}
+          {task.assignedTo && (
+            <div className="flex items-center gap-2 mt-2">
+              {task.assignedTo.avatarUrl ? (
+                <img
+                  src={task.assignedTo.avatarUrl}
+                  alt={task.assignedTo.name}
+                  className="w-5 h-5 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
+                  {task.assignedTo.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <span className="text-xs text-gray-600">{task.assignedTo.name}</span>
+            </div>
+          )}
         </div>
 
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 flex items-center justify-center rounded "
+            className="p-2 flex items-center justify-center rounded"
           >
             <MoreHorizontal className="w-4 h-5 text-blue-800" />
           </button>
 
           {isMenuOpen && (
             <div className="absolute right-0 top-full mt-1 z-50 min-w-[120px] bg-white border rounded-md shadow-lg py-1">
+              <div className="relative" ref={assignRef}>
+                <button
+                  onClick={() => {
+                    setIsAssignDropdownOpen(!isAssignDropdownOpen);
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Assign
+                </button>
+
+                {isAssignDropdownOpen && (
+                  <AssignUserDropdown
+                    taskId={task.id}
+                    assignedUserId={task.assignedTo?.id || null}
+                    onAssign={onAssignUser}
+                    onClose={() => {
+                      setIsAssignDropdownOpen(false);
+                      setIsMenuOpen(false);
+                    }}
+                  />
+                )}
+              </div>
+
               <button
                 onClick={() => {
                   onDelete(task.id);
@@ -68,16 +116,6 @@ export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser }: TaskCard
               >
                 <Trash2 className="w-4 h-4" />
                 Delete
-              </button>
-
-              <button
-                onClick={() => {
-                  onAssignUser(task.id, null);
-                  setIsMenuOpen(false);
-                }}
-                className="w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Unassign
               </button>
             </div>
           )}

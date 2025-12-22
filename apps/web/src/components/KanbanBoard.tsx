@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 
 import { KanbanColumn } from './KanbanColumn';
 
-import type { Column, Task, TaskStatus, User } from '@/types/kanban';
+import type { Column, Task, TaskStatus } from '@/types/kanban';
 
 import {
   assignUserToTask,
@@ -102,11 +102,11 @@ export const KanbanBoard = () => {
     }
   };
 
-  const handleAssignUser = async (taskId: string, user: User | null) => {
+  const handleAssignUser = async (taskId: string, userId: string | null) => {
     if (!id) return;
 
     try {
-      await assignUserToTask(taskId, user ? user.id : null);
+      await assignUserToTask(taskId, userId);
       const response = await fetchTasksByProject(id);
       setTasks(response.data);
       setError(null);
