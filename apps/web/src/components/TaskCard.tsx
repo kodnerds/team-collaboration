@@ -6,7 +6,6 @@ import { StatusIndicator } from './StatusIndicator';
 
 import type { Task } from '@/types/kanban';
 
-
 interface TaskCardProps {
   task: Task;
   onDelete: (taskId: string) => void;
