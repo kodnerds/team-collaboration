@@ -1,11 +1,11 @@
 import { MoreHorizontal, GripVertical, Trash2, NotebookPen } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
+import { EditTaskModal } from './EditTaskModal';
 import { StatusIndicator } from './StatusIndicator';
 
 import type { Task } from '@/types/kanban';
 
-import { EditTaskModal } from './EditTaskModal';
 
 interface TaskCardProps {
   task: Task;

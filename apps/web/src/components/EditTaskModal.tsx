@@ -2,6 +2,7 @@ import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 import type { Task, TaskStatus } from '@/types/kanban';
+
 import { COLUMNS } from '@/types/kanban';
 
 interface EditTaskModalProps {
@@ -38,8 +39,8 @@ export const EditTaskModal = ({ isOpen, onClose, task, onUpdate }: EditTaskModal
         status
       });
       onClose();
-    } catch (error) {
-      console.error('Failed to update task:', error);
+    } catch {
+      setIsSubmitting(false);
     } finally {
       setIsSubmitting(false);
     }
