@@ -66,6 +66,7 @@ export const TaskCard = ({ task, onDelete, onUpdate, onDragStart }: TaskCardProp
                     onDelete(task.id);
                     setIsMenuOpen(false);
                   }}
+                  onMouseDown={(e) => e.stopPropagation()}
                   className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 cursor-pointer hover:bg-gray-100 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />

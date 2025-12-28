@@ -39,8 +39,6 @@ export const EditTaskModal = ({ isOpen, onClose, task, onUpdate }: EditTaskModal
         status
       });
       onClose();
-    } catch {
-      setIsSubmitting(false);
     } finally {
       setIsSubmitting(false);
     }
