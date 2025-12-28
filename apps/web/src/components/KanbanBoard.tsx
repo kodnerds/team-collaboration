@@ -104,6 +104,21 @@ export const KanbanBoard = () => {
     }
   };
 
+  const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
+    if (!id) return;
+
+    try {
+      await updateTask(id, taskId, updates);
+      const response = await fetchTasksByProject(id);
+      setTasks(response.data);
+      setError(null);
+    } catch (err) {
+      const error = err as { message?: string };
+      setError(error.message || 'Failed to update task');
+      throw error;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-white">
@@ -143,6 +158,7 @@ export const KanbanBoard = () => {
               tasks={getTasksByColumn(column.id)}
               onAddTask={(title) => handleAddTask(title, column.id)}
               onDeleteTask={handleDeleteTask}
+              onUpdateTask={handleUpdateTask}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, column.id)}
