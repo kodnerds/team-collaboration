@@ -5,17 +5,6 @@ import InputField from './SignUp/inputField';
 
 const EditProject = () => {
   const { id } = useParams();
-
-  useEffect(() => {
-    const apiBaseUrl = 'http://localhost:3000';
-
-    fetch(`${apiBaseUrl}/api/v1/projects/${id}`)
-      .then((response) => response.json())
-      .then((data) =>
-        setProjectDetails({ ...projectDetails, name: data.name, description: data.description })
-      );
-  }, []);
-
   const navigate = useNavigate();
   const [projectDetails, setProjectDetails] = useState({
     name: '',
@@ -24,10 +13,18 @@ const EditProject = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [error, setError] = useState('');
-  const [_, setApiError] = useState('');
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProjectDetails((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    fetch(`${apiBaseUrl}/projects/${id}`)
+      .then((response) => response.json())
+      .then((data) =>
+        setProjectDetails({ ...projectDetails, name: data.name, description: data.description })
+      );
+  }, [id, projectDetails, apiBaseUrl]);
 
   const clientSideValidation = () => {
     let isFormValid = true;
@@ -47,7 +44,7 @@ const EditProject = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const base = import.meta.env.VITE_API_URL;
+
     setError('');
     setSuccessMessage('');
     if (!clientSideValidation()) {
@@ -55,15 +52,15 @@ const EditProject = () => {
     }
     setIsSubmitting(true);
     try {
-      const response = await fetch(`${base}/auth/project/:id`, {
-        method: 'POST',
+      const response = await fetch(`${apiBaseUrl}/projects/${id}`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(projectDetails)
       });
       const data = await response.json();
-      if (response.status === 201) {
+      if (response.status === 200) {
         const { id, name } = data.data;
         localStorage.setItem('userSession', JSON.stringify({ id, name }));
         setProjectDetails({ ...projectDetails, name: '', description: '' });
@@ -73,9 +70,9 @@ const EditProject = () => {
           navigate('/projects');
         }, 500);
       } else if (response.status === 400 || response.status === 409) {
-        setApiError(data.message || `API Error: Status ${response.status}`);
+        setError(data.message || `API Error: Status ${response.status}`);
       } else {
-        setApiError('An unexpected server error occurred. Please try again.');
+        setError('An unexpected server error occurred. Please try again.');
       }
     } finally {
       setIsSubmitting(false);
@@ -114,7 +111,7 @@ const EditProject = () => {
             name="name"
           />
           <div>
-            <p>{error ?? error} </p>
+            {error && <p className="text-red-500 text-sm">{error} </p>}
             <label
               htmlFor="description"
               className="input-label block text-sm font-semibold text-gray-700  mb-1"
@@ -138,7 +135,7 @@ const EditProject = () => {
               type="button"
               className="w-20 py-3 bg-white border  border-gray-300 text-blue-600 rounded-lg hover:bg-blue-600 transition font-medium   disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               onClick={() => {
-                navigate('/project');
+                navigate('/projects');
               }}
             >
               Cancel
