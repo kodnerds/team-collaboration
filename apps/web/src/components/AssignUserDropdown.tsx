@@ -7,12 +7,12 @@ import { fetchProjectMembers } from '@/api/projects';
 
 interface Props {
   taskId: string;
-  assignedUserId?: string | null;
+  assignedUserIds: string[];
   onAssign: (taskId: string, userId: string | null) => Promise<void>;
   onClose: () => void;
 }
 
-export const AssignUserDropdown = ({ taskId, assignedUserId, onAssign, onClose }: Props) => {
+export const AssignUserDropdown = ({ taskId, assignedUserIds, onAssign, onClose }: Props) => {
   const { id: projectId } = useParams<{ id: string }>();
 
   const [members, setMembers] = useState<ProjectMember[]>([]);
@@ -46,7 +46,7 @@ export const AssignUserDropdown = ({ taskId, assignedUserId, onAssign, onClose }
       {error && <p className="text-xs text-red-500 p-2">{error}</p>}
 
       {members.map((m) => {
-        const isAssigned = assignedUserId === m.id;
+        const isAssigned = assignedUserIds.includes(m.id);
 
         return (
           <button

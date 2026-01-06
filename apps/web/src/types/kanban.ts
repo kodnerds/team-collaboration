@@ -17,6 +17,9 @@ export interface Task {
     email?: string;
     avatarUrl?: string;
   } | null;
+  assignees?: {
+    id: string;
+  }[];
 }
 
 export interface Column {

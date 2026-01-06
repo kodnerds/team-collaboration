@@ -101,7 +101,7 @@ export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser, onUpdate }
                   {isAssignDropdownOpen && (
                     <AssignUserDropdown
                       taskId={task.id}
-                      assignedUserId={task.assignedTo?.id || null}
+                      assignedUserIds={task.assignees?.map((assignee) => assignee.id) ?? []}
                       onAssign={onAssignUser}
                       onClose={() => {
                         setIsAssignDropdownOpen(false);
