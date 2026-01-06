@@ -112,6 +112,16 @@ export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser, onUpdate }
                 </div>
                 <button
                   onClick={() => {
+                    setIsEditModalOpen(true);
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors"
+                >
+                  <NotebookPen className="w-4 h-4" />
+                  Edit
+                </button>
+                <button
+                  onClick={() => {
                     onDelete(task.id);
                     setIsMenuOpen(false);
                   }}
@@ -120,16 +130,6 @@ export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser, onUpdate }
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete
-                </button>
-                <button
-                  onClick={() => {
-                    setIsEditModalOpen(true);
-                    setIsMenuOpen(false);
-                  }}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors"
-                >
-                  <NotebookPen className="w-4 h-4" />
-                  Edit
                 </button>
               </div>
             )}

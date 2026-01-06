@@ -106,7 +106,7 @@ export const KanbanBoard = () => {
     if (!id) return;
 
     try {
-      await assignUserToTask(taskId, userId);
+      await assignUserToTask(id, taskId, userId);
       const response = await fetchTasksByProject(id);
       setTasks(response.data);
       setError(null);

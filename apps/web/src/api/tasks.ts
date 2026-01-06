@@ -112,13 +112,14 @@ export const deleteTask = async (projectId: string, taskId: string): Promise<boo
 };
 
 export const assignUserToTask = async (
+  projectId: string,
   taskId: string,
-  assignedUserId: string | null
+  userId: string | null
 ): Promise<{ data: Task }> => {
-  const response = await fetch(`${base}/tasks/${taskId}`, {
-    method: 'PATCH',
+  const response = await fetch(`${base}/projects/${projectId}/tasks/${taskId}/assignees`, {
+    method: 'POST',
     headers: getAuthHeaders(),
-    body: JSON.stringify({ assignedUserId })
+    body: JSON.stringify({ userIds: [userId] })
   });
 
   if (!response.ok) {
