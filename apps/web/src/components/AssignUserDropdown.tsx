@@ -22,7 +22,7 @@ export const AssignUserDropdown = ({ taskId, assignedUserId, onAssign, onClose }
   useEffect(() => {
     if (!projectId) return;
 
-    fetchProjectMembers(projectId)
+    fetchProjectMembers()
       .then(setMembers)
       .catch(() => setError('Failed to load members'));
   }, [projectId]);
@@ -42,7 +42,7 @@ export const AssignUserDropdown = ({ taskId, assignedUserId, onAssign, onClose }
   };
 
   return (
-    <div className="absolute z-50 bg-white border rounded-md shadow-md w-56 mt-2">
+    <div className="absolute right-0 z-50 bg-white border rounded-md shadow-md w-56 mt-2">
       {error && <p className="text-xs text-red-500 p-2">{error}</p>}
 
       {members.map((m) => {
@@ -66,7 +66,7 @@ export const AssignUserDropdown = ({ taskId, assignedUserId, onAssign, onClose }
               </div>
             )}
 
-            <span className="text-sm">{m.name}</span>
+            <span className="text-sm text-gray-600">{m.name}</span>
 
             {isAssigned && <span className="ml-auto text-xs text-blue-600">Assigned</span>}
           </button>

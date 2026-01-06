@@ -11,6 +11,7 @@ interface KanbanColumnProps {
   tasks: Task[];
   onAddTask: (title: string, columnId: TaskStatus) => void;
   onDeleteTask: (taskId: string) => void;
+  onUpdateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, columnId: TaskStatus) => void;
@@ -22,6 +23,7 @@ export const KanbanColumn = ({
   tasks,
   onAddTask,
   onDeleteTask,
+  onUpdateTask,
   onDragStart,
   onDragOver,
   onDrop,
@@ -58,6 +60,7 @@ export const KanbanColumn = ({
           onDelete={onDeleteTask}
           onDragStart={onDragStart}
           onAssignUser={onAssignUser}
+          onUpdate={onUpdateTask}
         />
       ))}
     </div>

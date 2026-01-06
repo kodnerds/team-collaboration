@@ -100,9 +100,9 @@ export const createProject = async (
   return response.json();
 };
 
-export const fetchProjectMembers = async (projectId: string): Promise<ProjectMember[]> => {
+export const fetchProjectMembers = async (): Promise<ProjectMember[]> => {
   const base = import.meta.env.VITE_API_URL;
-  const response = await fetch(`${base}/projects/${projectId}/members`, {
+  const response = await fetch(`${base}/auth/users`, {
     method: 'GET',
     headers: getAuthHeaders()
   });
@@ -116,8 +116,8 @@ export const fetchProjectMembers = async (projectId: string): Promise<ProjectMem
 
   const data = await response.json().catch(() => ({}));
 
-  if (Array.isArray(data?.data?.members)) return data.data.members as ProjectMember[];
-  if (Array.isArray(data?.members)) return data.members as ProjectMember[];
+  if (Array.isArray(data?.data)) return data.data as ProjectMember[];
+  if (Array.isArray(data)) return data as ProjectMember[];
   if (Array.isArray(data)) return data as ProjectMember[];
 
   return [];

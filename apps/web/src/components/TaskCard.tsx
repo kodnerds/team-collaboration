@@ -1,7 +1,8 @@
-import { MoreHorizontal, GripVertical, Trash2, UserPlus } from 'lucide-react';
+import { MoreHorizontal, GripVertical, Trash2, UserPlus, NotebookPen } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 import { AssignUserDropdown } from './AssignUserDropdown';
+import { EditTaskModal } from './EditTaskModal';
 import { StatusIndicator } from './StatusIndicator';
 
 import type { Task } from '@/types/kanban';
@@ -9,13 +10,15 @@ import type { Task } from '@/types/kanban';
 interface TaskCardProps {
   task: Task;
   onDelete: (taskId: string) => void;
+  onUpdate: (taskId: string, updates: Partial<Task>) => Promise<void>;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
   onAssignUser: (taskId: string, userId: string | null) => Promise<void>;
 }
 
-export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser }: TaskCardProps) => {
+export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser, onUpdate }: TaskCardProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAssignDropdownOpen, setIsAssignDropdownOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const assignRef = useRef<HTMLDivElement>(null);
 
@@ -34,93 +37,112 @@ export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser }: TaskCard
   }, []);
 
   return (
-    <div
-      draggable
-      onDragStart={(e) => onDragStart(e, task.id)}
-      className="group bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing"
-    >
-      <div className="flex items-start gap-2">
-        <GripVertical className="w-4 h-4 text-gray-400 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+    <>
+      <div
+        draggable
+        onDragStart={(e) => onDragStart(e, task.id)}
+        className="group bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing"
+      >
+        <div className="flex items-start gap-2">
+          <GripVertical className="w-4 h-4 text-gray-400 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <StatusIndicator status={task.status} className="w-2.5 h-2.5" />
-            <span className="text-xs text-gray-500 font-medium">#{task.id.slice(-4)}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <StatusIndicator status={task.status} className="w-2.5 h-2.5 ring-0" />
+              <span className="text-xs text-gray-500 font-medium">#{task.id.slice(-4)}</span>
+            </div>
+
+            <h4 className="text-sm font-medium text-gray-900 leading-snug">{task.title}</h4>
+
+            {task.description && (
+              <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task.description}</p>
+            )}
+
+            {/* Assigned User Display */}
+            {task.assignedTo && (
+              <div className="flex items-center gap-2 mt-2">
+                {task.assignedTo.avatarUrl ? (
+                  <img
+                    src={task.assignedTo.avatarUrl}
+                    alt={task.assignedTo.name}
+                    className="w-5 h-5 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
+                    {task.assignedTo.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="text-xs text-gray-600">{task.assignedTo.name}</span>
+              </div>
+            )}
           </div>
 
-          <h4 className="text-sm font-medium text-gray-900">{task.title}</h4>
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 flex items-center justify-center rounded "
+            >
+              <MoreHorizontal className="w-4 h-5 text-blue-800" />
+            </button>
 
-          {task.description && (
-            <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task.description}</p>
-          )}
+            {isMenuOpen && (
+              <div className="absolute right-0 top-full mt-1 z-50 min-w-[120px] bg-white border border-gray-200 rounded-md shadow-lg py-1">
+                <div className="relative" ref={assignRef}>
+                  <button
+                    onClick={() => {
+                      setIsAssignDropdownOpen(!isAssignDropdownOpen);
+                    }}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    Assign
+                  </button>
 
-          {/* Assigned User Display */}
-          {task.assignedTo && (
-            <div className="flex items-center gap-2 mt-2">
-              {task.assignedTo.avatarUrl ? (
-                <img
-                  src={task.assignedTo.avatarUrl}
-                  alt={task.assignedTo.name}
-                  className="w-5 h-5 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
-                  {task.assignedTo.name.charAt(0).toUpperCase()}
+                  {isAssignDropdownOpen && (
+                    <AssignUserDropdown
+                      taskId={task.id}
+                      assignedUserId={task.assignedTo?.id || null}
+                      onAssign={onAssignUser}
+                      onClose={() => {
+                        setIsAssignDropdownOpen(false);
+                        setIsMenuOpen(false);
+                      }}
+                    />
+                  )}
                 </div>
-              )}
-              <span className="text-xs text-gray-600">{task.assignedTo.name}</span>
-            </div>
-          )}
-        </div>
-
-        <div className="relative" ref={menuRef}>
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 flex items-center justify-center rounded"
-          >
-            <MoreHorizontal className="w-4 h-5 text-blue-800" />
-          </button>
-
-          {isMenuOpen && (
-            <div className="absolute right-0 top-full mt-1 z-50 min-w-[120px] bg-white border rounded-md shadow-lg py-1">
-              <div className="relative" ref={assignRef}>
                 <button
                   onClick={() => {
-                    setIsAssignDropdownOpen(!isAssignDropdownOpen);
+                    onDelete(task.id);
+                    setIsMenuOpen(false);
                   }}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 cursor-pointer hover:bg-gray-100 transition-colors"
                 >
-                  <UserPlus className="w-4 h-4" />
-                  Assign
+                  <Trash2 className="w-4 h-4" />
+                  Delete
                 </button>
-
-                {isAssignDropdownOpen && (
-                  <AssignUserDropdown
-                    taskId={task.id}
-                    assignedUserId={task.assignedTo?.id || null}
-                    onAssign={onAssignUser}
-                    onClose={() => {
-                      setIsAssignDropdownOpen(false);
-                      setIsMenuOpen(false);
-                    }}
-                  />
-                )}
+                <button
+                  onClick={() => {
+                    setIsEditModalOpen(true);
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors"
+                >
+                  <NotebookPen className="w-4 h-4" />
+                  Edit
+                </button>
               </div>
-
-              <button
-                onClick={() => {
-                  onDelete(task.id);
-                  setIsMenuOpen(false);
-                }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-gray-100"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      <EditTaskModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        task={task}
+        onUpdate={onUpdate}
+      />
+    </>
   );
 };
