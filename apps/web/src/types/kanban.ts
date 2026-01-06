@@ -11,15 +11,28 @@ export interface Task {
   title: string;
   description?: string;
   status: TaskStatus;
-  createdBy: CreatedBy;
-  createdAt: string;
-  updatedAt: string;
+  assignedTo?: {
+    id: string;
+    name: string;
+    email?: string;
+    avatarUrl?: string;
+  } | null;
+  assignees?: {
+    id: string;
+  }[];
 }
 
 export interface Column {
   id: TaskStatus;
   title: string;
   description: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
 }
 
 export const COLUMNS: Column[] = [

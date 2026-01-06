@@ -15,6 +15,7 @@ interface KanbanColumnProps {
   onDragStart: (e: React.DragEvent, taskId: string) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, columnId: TaskStatus) => void;
+  onAssignUser: (taskId: string, userId: string | null) => Promise<void>;
 }
 
 export const KanbanColumn = ({
@@ -25,7 +26,8 @@ export const KanbanColumn = ({
   onUpdateTask,
   onDragStart,
   onDragOver,
-  onDrop
+  onDrop,
+  onAssignUser
 }: KanbanColumnProps) => (
   <div
     className="flex flex-col min-w-[320px] max-w-[320px] bg-gray-50 rounded-xl"
@@ -56,8 +58,9 @@ export const KanbanColumn = ({
           key={task.id}
           task={task}
           onDelete={onDeleteTask}
-          onUpdate={onUpdateTask}
           onDragStart={onDragStart}
+          onAssignUser={onAssignUser}
+          onUpdate={onUpdateTask}
         />
       ))}
     </div>
