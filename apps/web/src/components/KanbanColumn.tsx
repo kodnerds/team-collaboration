@@ -11,6 +11,7 @@ interface KanbanColumnProps {
   tasks: Task[];
   onAddTask: (title: string, columnId: TaskStatus) => void;
   onDeleteTask: (taskId: string) => void;
+  onUpdateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, columnId: TaskStatus) => void;
@@ -21,6 +22,7 @@ export const KanbanColumn = ({
   tasks,
   onAddTask,
   onDeleteTask,
+  onUpdateTask,
   onDragStart,
   onDragOver,
   onDrop
@@ -50,7 +52,13 @@ export const KanbanColumn = ({
     {/* Tasks List */}
     <div className="flex-1 px-2 pb-2 space-y-2 overflow-y-auto scrollbar-thin max-h-[calc(100vh-280px)]">
       {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} onDelete={onDeleteTask} onDragStart={onDragStart} />
+        <TaskCard
+          key={task.id}
+          task={task}
+          onDelete={onDeleteTask}
+          onUpdate={onUpdateTask}
+          onDragStart={onDragStart}
+        />
       ))}
     </div>
 
