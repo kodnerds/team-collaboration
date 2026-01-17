@@ -16,7 +16,7 @@ const ProjectDetails = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const data = await getProjectById(Number(id));
+        const data = await getProjectById(id);
         if (!data) {
           setError('Project not found');
         }

@@ -4,8 +4,8 @@ import './App.css';
 
 import CreateProject from './components/Create-project';
 import EditProject from './components/EditProject';
+import { KanbanBoard } from './components/KanbanBoard';
 import Login from './components/Login';
-import ProjectDetails from './components/ProjectDetails';
 import ProjectsList from './components/ProjectsList';
 import SignupPage from './components/SignUp/SignupPage';
 
@@ -15,7 +15,7 @@ const App = () => (
     <Route path="/login" element={<Login />} />
     <Route path="/create-project" element={<CreateProject />} />
     <Route path="/projects" element={<ProjectsList />} />
-    <Route path="/projects/:id" element={<ProjectDetails />} />
+    <Route path="/projects/:id" element={<KanbanBoard />} />
 
     <Route path="edit-project/:id" element={<EditProject />} />
     <Route path="/signup" element={<SignupPage />} />

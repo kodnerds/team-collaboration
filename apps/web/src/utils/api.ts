@@ -2,11 +2,11 @@
 export { getProjects, createProject, type Project, type ProjectsResponse } from '../api/projects';
 
 // Legacy function for backwards compatibility (used by ProjectDetails)
-export const getProjectById = async (id: number) => {
+export const getProjectById = async (id: string) => {
   const { getProjects } = await import('../api/projects');
   try {
     const response = await getProjects();
-    return response.data.items.find((p) => p.id === id) || null;
+    return response.data.items.find((p) => p.id.toString() === id) || null;
   } catch {
     return null;
   }
