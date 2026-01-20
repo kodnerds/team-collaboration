@@ -110,7 +110,7 @@ const SignupPage = () => {
 
   return (
     <section className="min-h-screen bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4 relative overflow-hidden">
-      <main className="bg-white rounded-lg shadow-xl w-full px-10 py-5  max-w-[450px] relative z-10">
+      <main className="bg-white rounded-lg shadow-xl w-full px-10 py-10  max-w-[450px] relative z-10">
         <Toast message={apiError} duration={3000} />
         <form onSubmit={handleSubmit} className="form-container" noValidate>
           <h2 className="text-3xl text-center font-semibold text-gray-700 mb-2">Sign up</h2>
