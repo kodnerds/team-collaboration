@@ -44,7 +44,7 @@ export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser, onUpdate }
         className="group bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing"
       >
         <div className="flex items-start gap-2">
-          <GripVertical className="w-4 h-4 text-gray-400 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+          <GripVertical className="w-4 h-4 text-gray-400 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
@@ -57,30 +57,12 @@ export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser, onUpdate }
             {task.description && (
               <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task.description}</p>
             )}
-
-            {/* Assigned User Display */}
-            {task.assignedTo && (
-              <div className="flex items-center gap-2 mt-2">
-                {task.assignedTo.avatarUrl ? (
-                  <img
-                    src={task.assignedTo.avatarUrl}
-                    alt={task.assignedTo.name}
-                    className="w-5 h-5 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
-                    {task.assignedTo.name.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <span className="text-xs text-gray-600">{task.assignedTo.name}</span>
-              </div>
-            )}
           </div>
 
-          <div className="relative" ref={menuRef}>
+          <div className="relative flex flex-col items-center" ref={menuRef}>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 flex items-center justify-center rounded "
+              className="p-2 py-0 flex items-center justify-center rounded "
             >
               <MoreHorizontal className="w-4 h-5 text-blue-800" />
             </button>
@@ -131,6 +113,23 @@ export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser, onUpdate }
                   <Trash2 className="w-4 h-4" />
                   Delete
                 </button>
+              </div>
+            )}
+
+            {/* Assigned User Display */}
+            {task.assignees?.[0]?.id && (
+              <div className="flex items-center gap-2 mt-2">
+                {task.assignees?.[0]?.avatarUrl ? (
+                  <img
+                    src={task.assignees[0].avatarUrl}
+                    alt={task.assignees[0].name}
+                    className="w-5 h-5 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
+                    {task.assignees[0].name.charAt(0).toUpperCase()}
+                  </div>
+                )}
               </div>
             )}
           </div>

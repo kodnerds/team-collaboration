@@ -19,6 +19,9 @@ export interface Task {
   } | null;
   assignees?: {
     id: string;
+    name: string;
+    email?: string;
+    avatarUrl?: string;
   }[];
 }
 
