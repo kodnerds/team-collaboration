@@ -5,7 +5,7 @@ import type { TaskStatus } from '@/types/kanban';
 
 interface AddTaskFormProps {
   columnId: TaskStatus;
-  onAdd: (title: string, columnId: TaskStatus) => void;
+  onAdd: (title: string, description: string, columnId: TaskStatus) => void;
 }
 
 export const AddTaskForm = ({ columnId, onAdd }: AddTaskFormProps) => {
@@ -16,7 +16,7 @@ export const AddTaskForm = ({ columnId, onAdd }: AddTaskFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim()) {
-      onAdd(title.trim(), columnId);
+      onAdd(title.trim(), description.trim(), columnId);
       setTitle('');
       setDescription('');
       setIsOpen(false);
@@ -52,7 +52,6 @@ export const AddTaskForm = ({ columnId, onAdd }: AddTaskFormProps) => {
           className="w-full mb-2 text-sm text-black bg-white border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-600 transition-colors placeholder:text-gray-500"
         />
         <textarea
-          autoFocus
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter a description..."

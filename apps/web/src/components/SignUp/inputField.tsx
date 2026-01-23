@@ -32,7 +32,7 @@ const InputField = ({
       type={type}
       id={htmlFor}
       name={name}
-      className="w-full px-3 py-2.5 mb-1 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none bg-white text-black"
+      className="w-full px-3 py-2.5 mb-1 border-2 border-gray-300 text-gray-500 bg-white rounded focus:border-blue-500 focus:outline-none text-black"
       placeholder={placeholder}
     />
     <p className="text-red-500 mb-2.5 errMsg">{error && <span>{error} </span>}</p>

@@ -22,10 +22,11 @@ export const validateLoginFields = (
     newErrors.password = 'Password is required';
   } else if (password.length < 8) {
     newErrors.password = 'Password must be at least 8 characters';
-  } else if (!passwordRegex.test(password)) {
-    newErrors.password =
-      'Password must contain uppercase, lowercase, number, and special character';
   }
+  // else if (!passwordRegex.test(password)) {
+  //   newErrors.password =
+  //     'Password must contain uppercase, lowercase, number, and special character';
+  // }
 
   return newErrors;
 };
