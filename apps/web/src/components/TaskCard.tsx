@@ -15,7 +15,13 @@ interface TaskCardProps {
   onAssignUser: (taskId: string, userId: string | null) => Promise<void>;
 }
 
-export const TaskCard = ({ task, onDelete, onDragStart, onAssignUser, onUpdate }: TaskCardProps) => {
+export const TaskCard = ({
+  task,
+  onDelete,
+  onDragStart,
+  onAssignUser,
+  onUpdate
+}: TaskCardProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAssignDropdownOpen, setIsAssignDropdownOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
