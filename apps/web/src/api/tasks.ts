@@ -55,13 +55,16 @@ export const fetchTasksByProject = async (projectId: string): Promise<ProjectsRe
   return response.json();
 };
 
+/* eslint-disable max-params */
 export const createTask = async (
   projectId: string,
   title: string,
+  description: string,
   status: TaskStatus
 ): Promise<CreateProjectResponse> => {
   const newTask = {
     title,
+    description,
     status,
     createdAt: new Date().toISOString()
   };
@@ -78,6 +81,7 @@ export const createTask = async (
 
   return response.json();
 };
+/* eslint-enable max-params */
 
 // FIXED: Changed to PATCH and added projectId to URL
 export const updateTask = async (

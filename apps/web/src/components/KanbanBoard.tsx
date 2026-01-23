@@ -56,11 +56,11 @@ export const KanbanBoard = () => {
   const getTasksByColumn = (columnId: TaskStatus) =>
     tasks.filter((task) => task.status === columnId);
 
-  const handleAddTask = async (title: string, status: TaskStatus) => {
+  const handleAddTask = async (title: string, description: string, status: TaskStatus) => {
     if (!id) return;
 
     try {
-      await createTask(id, title, status);
+      await createTask(id, title, description, status);
       const response = await fetchTasksByProject(id);
       setTasks(response.data);
       setError(null);
@@ -165,7 +165,7 @@ export const KanbanBoard = () => {
               key={column.id}
               column={column}
               tasks={getTasksByColumn(column.id)}
-              onAddTask={(title) => handleAddTask(title, column.id)}
+              onAddTask={(title, description) => handleAddTask(title, description, column.id)}
               onDeleteTask={handleDeleteTask}
               onUpdateTask={handleUpdateTask}
               onDragStart={handleDragStart}

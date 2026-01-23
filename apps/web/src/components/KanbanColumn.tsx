@@ -9,7 +9,7 @@ import type { Column, Task, TaskStatus } from '@/types/kanban';
 interface KanbanColumnProps {
   column: Column;
   tasks: Task[];
-  onAddTask: (title: string, columnId: TaskStatus) => void;
+  onAddTask: (title: string, description: string, columnId: TaskStatus) => void;
   onDeleteTask: (taskId: string) => void;
   onUpdateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
