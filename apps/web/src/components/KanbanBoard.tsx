@@ -1,17 +1,19 @@
-import { LayoutGrid, AlertCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { AlertCircle, LayoutGrid } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { KanbanColumn } from './KanbanColumn';
 
-import type { TaskStatus, Column, Task } from '@/types/kanban';
+import type { Column, Task, TaskStatus } from '@/types/kanban';
 
-import { fetchTasksByProject, createTask, updateTask, deleteTask } from '@/api/tasks';
+import {
+  assignUserToTask,
+  createTask,
+  deleteTask,
+  fetchTasksByProject,
+  updateTask
+} from '@/api/tasks';
 import { COLUMNS } from '@/types/kanban';
-
-/* =========================
-   Drag helpers (OUTER SCOPE)
-   ========================= */
 
 const handleDragOver = (e: React.DragEvent) => {
   e.preventDefault();
@@ -22,10 +24,6 @@ const handleDragStart = (e: React.DragEvent, taskId: string) => {
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('taskId', taskId);
 };
-
-/* =========================
-   Component
-   ========================= */
 
 export const KanbanBoard = () => {
   const { id } = useParams<{ id: string }>();
@@ -45,8 +43,8 @@ export const KanbanBoard = () => {
         const response = await fetchTasksByProject(id);
         setTasks(response.data);
       } catch (err: unknown) {
-        const error = err as { message?: string };
-        setError(error.message || 'Failed to load tasks');
+        const message = err instanceof Error ? err.message : 'Failed to load tasks';
+        setError(message);
       } finally {
         setIsLoading(false);
       }
@@ -104,6 +102,20 @@ export const KanbanBoard = () => {
     }
   };
 
+  const handleAssignUser = async (taskId: string, userId: string | null) => {
+    if (!id) return;
+
+    try {
+      await assignUserToTask(id, taskId, userId);
+      const response = await fetchTasksByProject(id);
+      setTasks(response.data);
+      setError(null);
+    } catch (err) {
+      const error = err as { message?: string };
+      setError(error.message || 'Failed to assign user');
+    }
+  };
+
   const handleUpdateTask = async (taskId: string, updates: Partial<Task>) => {
     if (!id) return;
 
@@ -140,12 +152,9 @@ export const KanbanBoard = () => {
       </header>
 
       {error && (
-        <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-medium text-red-800">Error</p>
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
+        <div className="mx-6 mt-4 p-4 bg-red-50 border rounded flex gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 mt-1" />
+          <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
 
@@ -162,6 +171,7 @@ export const KanbanBoard = () => {
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, column.id)}
+              onAssignUser={handleAssignUser}
             />
           ))}
         </div>

@@ -39,6 +39,13 @@ export interface CreateProjectResponse {
   };
 }
 
+export interface ProjectMember {
+  id: string;
+  name: string;
+  email?: string;
+  avatarUrl?: string;
+}
+
 export const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -91,4 +98,27 @@ export const createProject = async (
   }
 
   return response.json();
+};
+
+export const fetchProjectMembers = async (): Promise<ProjectMember[]> => {
+  const base = import.meta.env.VITE_API_URL;
+  const response = await fetch(`${base}/auth/users`, {
+    method: 'GET',
+    headers: getAuthHeaders()
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const error = new Error(errorData?.message || 'Failed to fetch project members') as HttpError;
+    error.status = response.status;
+    throw error;
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (Array.isArray(data?.data)) return data.data as ProjectMember[];
+  if (Array.isArray(data)) return data as ProjectMember[];
+  if (Array.isArray(data)) return data as ProjectMember[];
+
+  return [];
 };
