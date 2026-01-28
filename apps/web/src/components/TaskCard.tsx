@@ -13,6 +13,7 @@ interface TaskCardProps {
   onUpdate: (taskId: string, updates: Partial<Task>) => Promise<void>;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
   onAssignUser: (taskId: string, userId: string | null) => Promise<void>;
+  onClick?: () => void;
 }
 
 export const TaskCard = ({
@@ -20,7 +21,8 @@ export const TaskCard = ({
   onDelete,
   onDragStart,
   onAssignUser,
-  onUpdate
+  onUpdate,
+  onClick
 }: TaskCardProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAssignDropdownOpen, setIsAssignDropdownOpen] = useState(false);
@@ -47,7 +49,8 @@ export const TaskCard = ({
       <div
         draggable
         onDragStart={(e) => onDragStart(e, task.id)}
-        className="group bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing"
+        onClick={onClick}
+        className="group bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing hover:cursor-pointer"
       >
         <div className="flex items-start gap-2">
           <GripVertical className="w-4 h-4 text-gray-400 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />

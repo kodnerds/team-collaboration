@@ -11,7 +11,8 @@ export interface Task {
   title: string;
   description?: string;
   status: TaskStatus;
-  assignedTo?: {
+  createdAt: string;
+  createdBy?: {
     id: string;
     name: string;
     email?: string;

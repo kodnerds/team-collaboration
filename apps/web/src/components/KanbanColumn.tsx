@@ -1,5 +1,6 @@
 import { MoreHorizontal } from 'lucide-react';
-
+import { useState } from 'react';
+import {TaskModal} from './TaskModal';
 import { AddTaskForm } from './AddTaskForm';
 import { StatusIndicator } from './StatusIndicator';
 import { TaskCard } from './TaskCard';
@@ -28,7 +29,22 @@ export const KanbanColumn = ({
   onDragOver,
   onDrop,
   onAssignUser
-}: KanbanColumnProps) => (
+}: KanbanColumnProps) => {
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedTask(null);
+  };
+
+  return (
+
   <div
     className="flex flex-col min-w-[320px] max-w-[320px] bg-gray-50 rounded-xl"
     onDragOver={onDragOver}
@@ -61,6 +77,7 @@ export const KanbanColumn = ({
           onDragStart={onDragStart}
           onAssignUser={onAssignUser}
           onUpdate={onUpdateTask}
+          onClick={() => handleTaskClick(task)}
         />
       ))}
     </div>
@@ -69,5 +86,12 @@ export const KanbanColumn = ({
     <div className="px-2 pb-3 mt-auto">
       <AddTaskForm columnId={column.id} onAdd={onAddTask} />
     </div>
+
+     <TaskModal 
+      open={isModalOpen} 
+      onOpenChange={handleModalClose}
+      task={selectedTask}
+    /> 
   </div>
-);
+  );
+};
