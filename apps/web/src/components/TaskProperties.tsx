@@ -8,27 +8,52 @@ interface Assignee {
 }
 
 interface TaskPropertiesProps {
-  status: "backlog" | "todo" | "doing" | "in_review" | "approved" | "done";
+  status: 'backlog' | 'todo' | 'doing' | 'in_review' | 'approved' | 'done';
   assignees: Assignee[];
   createdAt: string;
   createdBy: Assignee | null;
 }
 
 const statusConfig = {
-  "backlog": { label: "BACKLOG", bgColor: "bg-gray-100", textColor: "text-gray-700", dotColor: "bg-gray-400" },
-  "todo": { label: "TO DO", bgColor: "bg-blue-100", textColor: "text-blue-700", dotColor: "bg-blue-400" },
-  "doing": { label: "IN PROGRESS", bgColor: "bg-yellow-100", textColor: "text-yellow-700", dotColor: "bg-yellow-400" },
-  "in_review": { label: "REVIEW", bgColor: "bg-purple-100", textColor: "text-purple-700", dotColor: "bg-purple-400" },
-  "approved": { label: "APPROVED", bgColor: "bg-indigo-100", textColor: "text-indigo-700", dotColor: "bg-indigo-400" },
-  "done": { label: "DONE", bgColor: "bg-green-100", textColor: "text-green-700", dotColor: "bg-green-400" }
+  backlog: {
+    label: 'BACKLOG',
+    bgColor: 'bg-gray-100',
+    textColor: 'text-gray-700',
+    dotColor: 'bg-gray-400'
+  },
+  todo: {
+    label: 'TO DO',
+    bgColor: 'bg-blue-100',
+    textColor: 'text-blue-700',
+    dotColor: 'bg-blue-400'
+  },
+  doing: {
+    label: 'IN PROGRESS',
+    bgColor: 'bg-yellow-100',
+    textColor: 'text-yellow-700',
+    dotColor: 'bg-yellow-400'
+  },
+  in_review: {
+    label: 'REVIEW',
+    bgColor: 'bg-purple-100',
+    textColor: 'text-purple-700',
+    dotColor: 'bg-purple-400'
+  },
+  approved: {
+    label: 'APPROVED',
+    bgColor: 'bg-indigo-100',
+    textColor: 'text-indigo-700',
+    dotColor: 'bg-indigo-400'
+  },
+  done: {
+    label: 'DONE',
+    bgColor: 'bg-green-100',
+    textColor: 'text-green-700',
+    dotColor: 'bg-green-400'
+  }
 };
 
-export function TaskProperties({
-  status,
-  assignees,
-  createdAt,
-  createdBy
-}: TaskPropertiesProps) {
+export function TaskProperties({ status, assignees, createdAt, createdBy }: TaskPropertiesProps) {
   const statusInfo = statusConfig[status];
 
   return (
@@ -41,7 +66,9 @@ export function TaskProperties({
             <CircleCheck className="w-4 h-4" />
             <span>Status</span>
           </div>
-          <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusInfo.bgColor} ${statusInfo.textColor}`}>
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium ${statusInfo.bgColor} ${statusInfo.textColor}`}
+          >
             {statusInfo.label}
           </span>
         </div>
