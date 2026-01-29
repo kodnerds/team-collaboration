@@ -1,10 +1,10 @@
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import { TaskModal } from './TaskModal';
+
 import { AddTaskForm } from './AddTaskForm';
 import { StatusIndicator } from './StatusIndicator';
 import { TaskCard } from './TaskCard';
-
+import { TaskModal } from './TaskModal';
 import type { Column, Task, TaskStatus } from '@/types/kanban';
 
 interface KanbanColumnProps {
