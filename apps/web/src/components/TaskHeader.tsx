@@ -24,4 +24,4 @@ export const TaskHeader = ({ taskId, onClose }: TaskHeaderProps) => {
       </div>
     </div>
   );
-}
+};
