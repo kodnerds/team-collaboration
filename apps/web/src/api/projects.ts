@@ -26,6 +26,20 @@ export interface ProjectsResponse {
   };
 }
 
+export interface GetProjectResponse {
+  message: string;
+  data: {
+    id: number;
+    name: string;
+    description?: string;
+    createdBy: {
+      id: number;
+      name: string;
+      email: string;
+    };
+  };
+}
+
 export interface CreateProjectResponse {
   message: string;
   data: {
@@ -123,6 +137,23 @@ export const updateProject = async (
     const error = new Error(
       errorData?.message || errorData?.errors?.[0] || 'Failed to update project'
     ) as HttpError;
+    error.status = response.status;
+    throw error;
+  }
+
+  return response.json();
+};
+
+export const getProject = async (id: string): Promise<GetProjectResponse> => {
+  const base = import.meta.env.VITE_API_URL;
+  const response = await fetch(`${base}/projects/${id}`, {
+    method: 'GET',
+    headers: getAuthHeaders()
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const error = new Error(errorData?.message || 'Failed to fetch project') as HttpError;
     error.status = response.status;
     throw error;
   }

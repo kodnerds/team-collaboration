@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useParams } from 'react-router-dom';
 
-import { updateProject } from '../api/projects';
+import { updateProject, type GetProjectResponse } from '../api/projects';
+import { getProject } from '../api/projects';
 
 interface FormErrors {
   projectName?: string;
@@ -15,9 +16,35 @@ const EditProject = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [project, setProject] = useState<GetProjectResponse | null>(null);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   const { id } = useParams();
   const projectId = String(id);
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        const project = await getProject(projectId);
+        setProject(project);
+        setProjectName(project.data.name);
+        setDescription(project.data.description || '');
+      } catch (err: unknown) {
+        const error = err as { status?: number; message?: string };
+        setErrors({ general: error.message || 'Failed to update project. Please try again.' });
+      }
+    };
+
+    fetchProject();
+  }, [projectId]);
+
+  useEffect(() => {
+    if (projectName === project?.data.name && description === project?.data.description) {
+      setIsButtonDisabled(true);
+    } else {
+      setIsButtonDisabled(false);
+    }
+  }, [projectName, description, project?.data.name, project?.data.description]);
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -98,9 +125,7 @@ const EditProject = () => {
       setSuccessMessage('Project updated successfully!');
 
       // Brief delay to show success message, then redirect
-      setTimeout(() => {
-        navigate('/projects');
-      }, 1000);
+      navigate('/projects');
     } catch (err: unknown) {
       const error = err as { status?: number; message?: string };
 
@@ -241,7 +266,7 @@ const EditProject = () => {
           <button
             type="submit"
             className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            disabled={isSubmitting || !!successMessage}
+            disabled={isButtonDisabled || isSubmitting || !!successMessage}
           >
             {renderButtonContent()}
           </button>
