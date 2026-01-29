@@ -74,7 +74,7 @@ const Login = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2.5 mb-3 border-2 border-gray-300 text-gray-500 bg-white rounded focus:border-blue-500 focus:outline-none text-gray-900 text-sm"
+            className="w-full px-3 py-2.5 mb-3 border-2 border-gray-300 text-gray-500 bg-white rounded focus:border-blue-500 focus:outline-none text-sm"
           />
           {errors.password && <div className="text-red-500 mb-2.5">{errors.password}</div>}
 
@@ -88,17 +88,8 @@ const Login = () => {
         </form>
 
         <div className="text-center mt-5">
-          <Link to="/forgot-password" className="mr-4 text-blue-700 no-underline hover:underline">
-            Forgot Password?
-          </Link>
           <Link to="/signup" className="text-blue-700 no-underline hover:underline">
-            Create Account
-          </Link>
-          <Link
-            to="/create-project"
-            className="block mt-4 text-blue-700 no-underline hover:underline"
-          >
-            Create Project
+            Create Account Instead?
           </Link>
         </div>
       </div>
