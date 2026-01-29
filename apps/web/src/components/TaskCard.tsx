@@ -13,6 +13,7 @@ interface TaskCardProps {
   onUpdate: (taskId: string, updates: Partial<Task>) => Promise<void>;
   onDragStart: (e: React.DragEvent, taskId: string) => void;
   onAssignUser: (taskId: string, userId: string | null) => Promise<void>;
+  onClick?: () => void;
 }
 
 export const TaskCard = ({
@@ -20,13 +21,15 @@ export const TaskCard = ({
   onDelete,
   onDragStart,
   onAssignUser,
-  onUpdate
+  onUpdate,
+  onClick
 }: TaskCardProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAssignDropdownOpen, setIsAssignDropdownOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const assignRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -46,8 +49,19 @@ export const TaskCard = ({
     <>
       <div
         draggable
-        onDragStart={(e) => onDragStart(e, task.id)}
-        className="group bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing"
+        onDragStart={(e) => {
+          isDraggingRef.current = true;
+          onDragStart(e, task.id);
+        }}
+        onMouseDown={() => {
+          isDraggingRef.current = false;
+        }}
+        onClick={() => {
+          if (!isDraggingRef.current) {
+            onClick?.();
+          }
+        }}
+        className="group bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing hover:cursor-pointer"
       >
         <div className="flex items-start gap-2">
           <GripVertical className="w-4 h-4 text-gray-400 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
@@ -67,7 +81,10 @@ export const TaskCard = ({
 
           <div className="relative flex flex-col items-center" ref={menuRef}>
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMenuOpen(!isMenuOpen);
+              }}
               className="p-2 py-0 flex items-center justify-center rounded "
             >
               <MoreHorizontal className="w-4 h-5 text-blue-800" />
@@ -77,7 +94,8 @@ export const TaskCard = ({
               <div className="absolute right-0 top-full mt-1 z-50 min-w-[120px] bg-white border border-gray-200 rounded-md shadow-lg py-1">
                 <div className="relative" ref={assignRef}>
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setIsAssignDropdownOpen(!isAssignDropdownOpen);
                     }}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -99,7 +117,8 @@ export const TaskCard = ({
                   )}
                 </div>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setIsEditModalOpen(true);
                     setIsMenuOpen(false);
                   }}
