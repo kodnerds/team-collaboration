@@ -8,10 +8,10 @@ interface Assignee {
 }
 
 interface TaskPropertiesProps {
-  status: 'backlog' | 'todo' | 'doing' | 'in_review' | 'approved' | 'done';
-  assignees: Assignee[];
-  createdAt: string;
-  createdBy: Assignee | null;
+  readonly status: 'backlog' | 'todo' | 'doing' | 'in_review' | 'approved' | 'done';
+  readonly assignees: Assignee[];
+  readonly createdAt: string;
+  readonly createdBy: Assignee | null;
 }
 
 const statusConfig = {
@@ -53,7 +53,12 @@ const statusConfig = {
   }
 };
 
-export function TaskProperties({ status, assignees, createdAt, createdBy }: TaskPropertiesProps) {
+export const TaskProperties = ({
+  status,
+  assignees,
+  createdAt,
+  createdBy
+}: TaskPropertiesProps) => {
   const statusInfo = statusConfig[status];
 
   return (
@@ -144,4 +149,4 @@ export function TaskProperties({ status, assignees, createdAt, createdBy }: Task
       </div>
     </div>
   );
-}
+};

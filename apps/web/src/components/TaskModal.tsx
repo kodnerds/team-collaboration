@@ -1,29 +1,40 @@
-import { TaskHeader } from './TaskHeader';
-import { TaskProperties } from './TaskProperties';
-import { TaskDescription } from './TaskDescription';
 import type { Task } from '@/types/kanban';
 
+import { TaskDescription } from './TaskDescription';
+import { TaskHeader } from './TaskHeader';
+import { TaskProperties } from './TaskProperties';
+
 interface TaskModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  task?: Task | null;
+  readonly open: boolean;
+  readonly onOpenChange: (open: boolean) => void;
+  readonly task?: Task | null;
 }
 
-export function TaskModal({ open, onOpenChange, task }: TaskModalProps) {
+// Deterministic color generator based on string hash
+function getColorFromString(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, 70%, 60%)`;
+}
+
+export const TaskModal = ({ open, onOpenChange, task }: TaskModalProps) => {
   if (!open || !task) return null;
 
   const taskData = {
     id: task.id,
     title: task.title,
-    status: task.status as any,
+    status: task.status,
     assignees: (task.assignees || []).map((assignee) => ({
       ...assignee,
       initials: assignee.name
         .split(' ')
-        .map((n) => n[0])
+        .map((n) => String.fromCodePoint(n.codePointAt(0)!))
         .join('')
         .toUpperCase(),
-      color: `hsl(${Math.random() * 360}, 70%, 60%)`
+      color: getColorFromString(assignee.name)
     })),
     description: task.description || 'No description provided',
     createdAt: new Date(task.createdAt).toLocaleDateString('en-US', {
@@ -36,10 +47,10 @@ export function TaskModal({ open, onOpenChange, task }: TaskModalProps) {
           ...task.createdBy,
           initials: task.createdBy.name
             .split(' ')
-            .map((n) => n[0])
+            .map((n) => String.fromCodePoint(n.codePointAt(0)!))
             .join('')
             .toUpperCase(),
-          color: `hsl(${Math.random() * 360}, 70%, 60%)`
+          color: getColorFromString(task.createdBy.name)
         }
       : null
   };
@@ -68,4 +79,4 @@ export function TaskModal({ open, onOpenChange, task }: TaskModalProps) {
       </div>
     </div>
   );
-}
+};

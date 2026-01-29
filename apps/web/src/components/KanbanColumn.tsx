@@ -5,6 +5,7 @@ import { AddTaskForm } from './AddTaskForm';
 import { StatusIndicator } from './StatusIndicator';
 import { TaskCard } from './TaskCard';
 import { TaskModal } from './TaskModal';
+
 import type { Column, Task, TaskStatus } from '@/types/kanban';
 
 interface KanbanColumnProps {
