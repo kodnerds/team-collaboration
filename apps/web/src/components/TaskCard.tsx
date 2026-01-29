@@ -81,7 +81,10 @@ export const TaskCard = ({
 
           <div className="relative flex flex-col items-center" ref={menuRef}>
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMenuOpen(!isMenuOpen);
+              }}
               className="p-2 py-0 flex items-center justify-center rounded "
             >
               <MoreHorizontal className="w-4 h-5 text-blue-800" />
@@ -91,7 +94,8 @@ export const TaskCard = ({
               <div className="absolute right-0 top-full mt-1 z-50 min-w-[120px] bg-white border border-gray-200 rounded-md shadow-lg py-1">
                 <div className="relative" ref={assignRef}>
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setIsAssignDropdownOpen(!isAssignDropdownOpen);
                     }}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -113,7 +117,8 @@ export const TaskCard = ({
                   )}
                 </div>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setIsEditModalOpen(true);
                     setIsMenuOpen(false);
                   }}

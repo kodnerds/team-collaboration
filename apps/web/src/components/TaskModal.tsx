@@ -72,7 +72,10 @@ export const TaskModal = ({ open, onOpenChange, task }: TaskModalProps) => {
   if (!open || !task) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div
+      onClick={() => onOpenChange(false)}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+    >
       <div className="max-w-4xl max-h-[70vh] md:max-h-[50vh] h-[70vh] md:!h-[50vh] w-[80vw] md:w-[40vw] bg-white border border-gray-200 rounded-lg shadow-lg p-0 gap-0 overflow-x-hidden overflow-y-auto relative">
         <TaskHeader taskId={task.id} onClose={() => onOpenChange(false)} />
         <div className="flex">
