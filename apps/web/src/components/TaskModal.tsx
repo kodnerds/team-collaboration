@@ -26,14 +26,12 @@ const getColorFromString = (str: string): string => {
 };
 
 export const TaskModal = ({ open, onOpenChange, task }: TaskModalProps) => {
-  if (!open || !task) return null;
-
   const taskData = useMemo(
     () => ({
-      id: task.id,
-      title: task.title,
-      status: task.status,
-      assignees: (task.assignees || []).map((assignee) => ({
+      id: task?.id,
+      title: task?.title,
+      status: task?.status || 'backlog',
+      assignees: (task?.assignees || []).map((assignee) => ({
         ...assignee,
         initials: assignee.name
           .split(' ')
@@ -45,13 +43,13 @@ export const TaskModal = ({ open, onOpenChange, task }: TaskModalProps) => {
           .toUpperCase(),
         color: getColorFromString(assignee.name)
       })),
-      description: task.description || 'No description provided',
-      createdAt: new Date(task.createdAt).toLocaleDateString('en-US', {
+      description: task?.description || 'No description provided',
+      createdAt: task?.createdAt ? new Date(task.createdAt).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
-      }),
-      createdBy: task.createdBy
+      }) : '',
+      createdBy: task?.createdBy
         ? {
             ...task.createdBy,
             initials: task.createdBy.name
@@ -68,6 +66,8 @@ export const TaskModal = ({ open, onOpenChange, task }: TaskModalProps) => {
     }),
     [task]
   );
+
+  if (!open || !task) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
