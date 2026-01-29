@@ -44,11 +44,13 @@ export const TaskModal = ({ open, onOpenChange, task }: TaskModalProps) => {
         color: getColorFromString(assignee.name)
       })),
       description: task?.description || 'No description provided',
-      createdAt: task?.createdAt ? new Date(task.createdAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      }) : '',
+      createdAt: task?.createdAt
+        ? new Date(task.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })
+        : '',
       createdBy: task?.createdBy
         ? {
             ...task.createdBy,
