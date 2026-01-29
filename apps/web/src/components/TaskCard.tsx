@@ -29,6 +29,7 @@ export const TaskCard = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const assignRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -48,8 +49,18 @@ export const TaskCard = ({
     <>
       <div
         draggable
-        onDragStart={(e) => onDragStart(e, task.id)}
-        onClick={onClick}
+        onDragStart={(e) => {
+          isDraggingRef.current = true;
+          onDragStart(e, task.id);
+        }}
+        onMouseDown={() => {
+          isDraggingRef.current = false;
+        }}
+        onClick={() => {
+          if (!isDraggingRef.current) {
+            onClick?.();
+          }
+        }}
         className="group bg-white border border-gray-200 rounded-lg p-3 shadow-sm hover:shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing hover:cursor-pointer"
       >
         <div className="flex items-start gap-2">

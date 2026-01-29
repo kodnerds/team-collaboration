@@ -1,5 +1,7 @@
 import { CircleCheck, User, Calendar, UserPlus } from 'lucide-react';
 
+import type { TaskStatus } from '@/types/kanban';
+
 interface Assignee {
   id: string;
   name: string;
@@ -8,7 +10,7 @@ interface Assignee {
 }
 
 interface TaskPropertiesProps {
-  readonly status: 'backlog' | 'todo' | 'doing' | 'in_review' | 'approved' | 'done';
+  readonly status: TaskStatus;
   readonly assignees: Assignee[];
   readonly createdAt: string;
   readonly createdBy: Assignee | null;
@@ -64,7 +66,8 @@ export const TaskProperties = ({
   return (
     <div className="flex flex-col gap-4 py-4">
       {/* Status and Assignees Row */}
-      <div className="flex items-center justify-between">
+      <div className="flex !flex-col  md:!flex-row lg:!flex-row px-2 justify-between gap-4">
+        {/* Created Date */}
         {/* Status */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -113,7 +116,7 @@ export const TaskProperties = ({
       </div>
 
       {/* Created Date and Created By */}
-      <div className="flex items-center justify-between">
+      <div className="flex  !flex-col  md:!flex-row lg:!flex-row px-2 justify-between gap-4">
         {/* Created Date */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 text-sm text-gray-600">
