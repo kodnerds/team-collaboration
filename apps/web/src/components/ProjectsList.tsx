@@ -1,3 +1,4 @@
+import { SquarePen } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -150,13 +151,19 @@ const ProjectsList = () => {
           /* Projects grid - Trello-inspired card design */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {projects.map((project) => (
-              <div
+              <Link
                 key={project.id}
-                onClick={() => navigate(`/projects/${project.id}`)}
+                to={`/projects/${project.id}`}
                 className="group p-5 rounded-lg border border-gray-200 bg-white shadow-sm cursor-pointer transition-all hover:shadow-md hover:border-blue-200 hover:-translate-y-0.5"
               >
                 {/* Project color bar */}
-                <div className="h-1 w-12 bg-blue-500 rounded-full mb-4 group-hover:w-16 transition-all" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className="h-1 w-12 bg-blue-500 rounded-full mb-4 group-hover:w-16 transition-all" />
+
+                  <Link to={`/edit-project/${project.id}`}>
+                    <SquarePen className="text-blue-500 cursor-pointer" />
+                  </Link>
+                </div>
 
                 <h2 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
                   {project.name}
@@ -175,7 +182,7 @@ const ProjectsList = () => {
                     {project.createdBy?.name || 'Unknown'}
                   </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
