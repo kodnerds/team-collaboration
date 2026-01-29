@@ -26,6 +26,20 @@ export interface ProjectsResponse {
   };
 }
 
+export interface GetProjectResponse {
+  message: string;
+  data: {
+    id: number;
+    name: string;
+    description?: string;
+    createdBy: {
+      id: number;
+      name: string;
+      email: string;
+    };
+  };
+}
+
 export interface CreateProjectResponse {
   message: string;
   data: {
@@ -93,6 +107,53 @@ export const createProject = async (
     const error = new Error(
       errorData?.message || errorData?.errors?.[0] || 'Failed to create project'
     ) as HttpError;
+    error.status = response.status;
+    throw error;
+  }
+
+  return response.json();
+};
+
+export const updateProject = async (
+  id: string,
+  name: string,
+  description?: string
+): Promise<CreateProjectResponse> => {
+  if (!name || name.trim().length < 3) {
+    const error = new Error('Project name must be at least 3 characters long') as HttpError;
+    error.status = 400;
+    throw error;
+  }
+
+  const base = import.meta.env.VITE_API_URL;
+  const response = await fetch(`${base}/projects/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ name: name.trim(), description: description?.trim() || undefined })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const error = new Error(
+      errorData?.message || errorData?.errors?.[0] || 'Failed to update project'
+    ) as HttpError;
+    error.status = response.status;
+    throw error;
+  }
+
+  return response.json();
+};
+
+export const getProject = async (id: string): Promise<GetProjectResponse> => {
+  const base = import.meta.env.VITE_API_URL;
+  const response = await fetch(`${base}/projects/${id}`, {
+    method: 'GET',
+    headers: getAuthHeaders()
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const error = new Error(errorData?.message || 'Failed to fetch project') as HttpError;
     error.status = response.status;
     throw error;
   }
