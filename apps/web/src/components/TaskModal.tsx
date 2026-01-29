@@ -1,8 +1,8 @@
-import type { Task } from '@/types/kanban';
-
 import { TaskDescription } from './TaskDescription';
 import { TaskHeader } from './TaskHeader';
 import { TaskProperties } from './TaskProperties';
+
+import type { Task } from '@/types/kanban';
 
 interface TaskModalProps {
   readonly open: boolean;
@@ -11,14 +11,17 @@ interface TaskModalProps {
 }
 
 // Deterministic color generator based on string hash
-function getColorFromString(str: string): string {
+const getColorFromString = (str: string): string => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    const charCode = str.codePointAt(i);
+    if (charCode !== undefined) {
+      hash = charCode + ((hash << 5) - hash);
+    }
   }
   const hue = Math.abs(hash) % 360;
   return `hsl(${hue}, 70%, 60%)`;
-}
+};
 
 export const TaskModal = ({ open, onOpenChange, task }: TaskModalProps) => {
   if (!open || !task) return null;
@@ -31,7 +34,10 @@ export const TaskModal = ({ open, onOpenChange, task }: TaskModalProps) => {
       ...assignee,
       initials: assignee.name
         .split(' ')
-        .map((n) => String.fromCodePoint(n.codePointAt(0)!))
+        .map((n) => {
+          const codePoint = n.codePointAt(0);
+          return codePoint ? String.fromCodePoint(codePoint) : '';
+        })
         .join('')
         .toUpperCase(),
       color: getColorFromString(assignee.name)
@@ -47,7 +53,10 @@ export const TaskModal = ({ open, onOpenChange, task }: TaskModalProps) => {
           ...task.createdBy,
           initials: task.createdBy.name
             .split(' ')
-            .map((n) => String.fromCodePoint(n.codePointAt(0)!))
+            .map((n) => {
+              const codePoint = n.codePointAt(0);
+              return codePoint ? String.fromCodePoint(codePoint) : '';
+            })
             .join('')
             .toUpperCase(),
           color: getColorFromString(task.createdBy.name)
