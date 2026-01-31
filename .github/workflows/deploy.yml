@@ -1,0 +1,35 @@
+name: Deploy to Render
+
+on:
+  workflow_run:
+    workflows: ['Integration Workflow']
+    types:
+      - completed
+    branches: ['main']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only deploy if CI passed and it was on main branch
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+
+    steps:
+      - name: 🚀 Deploy API to Render
+        run: |
+          curl -X POST "${{ secrets.RENDER_API_DEPLOY_HOOK }}"
+        env:
+          RENDER_API_DEPLOY_HOOK: ${{ secrets.RENDER_API_DEPLOY_HOOK }}
+
+      - name: 🌐 Deploy Web to Render
+        run: |
+          curl -X POST "${{ secrets.RENDER_WEB_DEPLOY_HOOK }}"
+        env:
+          RENDER_WEB_DEPLOY_HOOK: ${{ secrets.RENDER_WEB_DEPLOY_HOOK }}
+
+      - name: ✅ Deployment Triggered
+        run: |
+          echo "Deployment hooks triggered successfully!"
+          echo "API Deploy Hook: Triggered"
+          echo "Web Deploy Hook: Triggered"
+          echo ""
+          echo "Note: Actual deployment status can be monitored in Render dashboard"
