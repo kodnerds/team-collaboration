@@ -3,10 +3,8 @@
 
 databases:
   - name: team-collaboration-db
-    plan: free # Change to 'starter' or higher for production
     databaseName: team_collaboration
     user: tc_user
-    region: oregon # Choose: oregon, ohio, virginia, frankfurt, singapore
 
 services:
   # API Web Service (Docker)
