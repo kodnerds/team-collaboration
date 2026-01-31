@@ -98,6 +98,19 @@ Run from `apps/web`:
 | `npm run build` | Build for production |
 | `npm run preview` | Preview production build |
 
+## Deployment
+
+This project supports continuous deployment to [Render](https://render.com) via GitHub Actions.
+
+See [docs/RENDER_DEPLOYMENT.md](./docs/RENDER_DEPLOYMENT.md) for complete setup instructions.
+
+### Quick Deploy
+
+1. Render Dashboard → **New** → **Blueprint** → connect repo (auto-creates all services)
+2. Get Deploy Hooks from each service (Settings → Deploy Hook)
+3. Add to GitHub Secrets: `RENDER_API_DEPLOY_HOOK`, `RENDER_WEB_DEPLOY_HOOK`
+4. Push to `main` → deploys automatically after CI passes
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines on:
