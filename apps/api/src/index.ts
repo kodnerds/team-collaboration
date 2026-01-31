@@ -51,6 +51,7 @@ const main = async () => {
 
   app.listen(PORT, () => {
     logger.info(`Api running on http://localhost:${PORT}`);
+    logger.info(`API documentation available at http://localhost:${PORT}/docs`);
   });
 };
 
