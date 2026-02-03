@@ -51,9 +51,8 @@ services:
         value: info
 
   # Web Static Site (Vite/React)
-  - type: web
+  - type: pstatic
     name: team-collaboration-web
-    runtime: static
     plan: free
     buildCommand: npm install && npm run build --workspace=@tc/web
     staticPublishPath: apps/web/dist
