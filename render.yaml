@@ -12,6 +12,7 @@ services:
   # API Web Service (Docker)
   - type: web
     name: team-collaboration-api
+    autoDeployTrigger: checksPass
     runtime: docker
     dockerfilePath: apps/api/Dockerfile
     dockerContext: .
@@ -53,6 +54,7 @@ services:
   # Web Static Site (Vite/React)
   - type: web
     name: team-collaboration-web
+    autoDeployTrigger: checksPass
     runtime: static
     buildCommand: npm install && npm run build --workspace=@tc/web
     staticPublishPath: apps/web/dist
