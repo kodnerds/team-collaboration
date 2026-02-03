@@ -1,6 +1,7 @@
 import envConfig from '../config/envConfig';
 
-import { AppDataSource, TestDataSource } from './data-source';
+import AppDataSource from './data-source';
+import { TestDataSource } from './test-data-source';
 
 import type { EntityTarget, ObjectLiteral, Repository } from 'typeorm';
 

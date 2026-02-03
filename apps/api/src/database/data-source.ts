@@ -3,35 +3,22 @@ import { DataSource } from 'typeorm';
 
 import envConfig from '../config/envConfig';
 
-import type { DataSourceOptions } from 'typeorm';
+// Detect if running as compiled JS (from dist folder)
+const isCompiled = __dirname.includes('dist');
 
-export const AppDataSource = new DataSource({
+const AppDataSource = new DataSource({
   type: 'postgres',
   host: envConfig.POSTGRES_HOST,
   port: envConfig.POSTGRES_PORT,
   username: envConfig.POSTGRES_USER,
   password: envConfig.POSTGRES_PASSWORD,
   database: envConfig.POSTGRES_DB,
-  synchronize: true,
+  synchronize: false,
   logging: false,
-  entities: [
-    process.env.NODE_ENV === 'production' ? 'dist/entities/**/*.js' : 'src/entities/**/*.ts'
-  ],
-  migrations: [],
+  entities: [isCompiled ? 'dist/src/entities/**/*.js' : 'src/entities/**/*.ts'],
+  migrations: [isCompiled ? 'dist/src/migrations/**/*.js' : 'src/migrations/**/*.ts'],
   subscribers: []
 });
 
-export const testDatabaseConfig: DataSourceOptions = {
-  type: 'postgres',
-  host: 'localhost',
-  port: 2345,
-  username: 'root',
-  database: 'test',
-  // eslint-disable-next-line sonarjs/no-hardcoded-passwords
-  password: 'easypass',
-  synchronize: true,
-  dropSchema: true,
-  entities: ['src/entities/**/*.ts']
-};
-
-export const TestDataSource = new DataSource(testDatabaseConfig);
+// Only default export for TypeORM CLI
+export default AppDataSource;
