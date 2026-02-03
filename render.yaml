@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/render-oss/blueprint-spec/main/schema.json
 # Render Blueprint - Infrastructure as Code
 # See: https://render.com/docs/blueprint-spec
 
@@ -5,6 +6,7 @@ databases:
   - name: team-collaboration-db
     databaseName: team_collaboration
     user: tc_user
+    plan: free
 
 services:
   # API Web Service (Docker)
@@ -53,7 +55,6 @@ services:
     name: team-collaboration-web
     runtime: static
     plan: free
-    region: oregon
     buildCommand: npm install && npm run build --workspace=@tc/web
     staticPublishPath: apps/web/dist
     headers:
