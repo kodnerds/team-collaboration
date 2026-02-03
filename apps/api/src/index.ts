@@ -29,6 +29,14 @@ const main = async () => {
   app.use(helmet());
 
   await AppDataSource.initialize();
+  logger.info('Database connection initialized');
+
+  // Run pending migrations on startup (for Render free tier)
+  if (envConfig.NODE_ENV === 'production') {
+    logger.info('Running pending migrations...');
+    await AppDataSource.runMigrations();
+    logger.info('Migrations completed successfully');
+  }
 
   app.use(json());
   app.use(urlencoded({ extended: true }));

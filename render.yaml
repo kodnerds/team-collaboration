@@ -19,7 +19,6 @@ services:
     plan: free # Change to 'starter' or higher for production
     region: oregon
     healthCheckPath: /api/health
-    preDeployCommand: cd /app/apps/api && npm run migration:run:prod
     envVars:
       - key: NODE_ENV
         value: production

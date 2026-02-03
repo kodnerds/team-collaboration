@@ -59,7 +59,6 @@
     "typeorm": "npm run build && cross-env POSTGRES_HOST=localhost npx typeorm -d dist/src/database/data-source.js",
     "migration:generate": "npm run typeorm migration:generate src/migrations/new-migration",
     "migration:run": "npm run typeorm migration:run",
-    "migration:revert": "npm run typeorm migration:revert",
-    "migration:run:prod": "npx typeorm migration:run -d dist/src/database/data-source.js"
+    "migration:revert": "npm run typeorm migration:revert"
   }
 }
