@@ -1,4 +1,3 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/render-oss/blueprint-spec/main/schema.json
 # Render Blueprint - Infrastructure as Code
 # See: https://render.com/docs/blueprint-spec
 
@@ -16,7 +15,7 @@ services:
     runtime: docker
     dockerfilePath: apps/api/Dockerfile
     dockerContext: .
-    plan: free # Change to 'starter' or higher for production
+    plan: free
     region: oregon
     healthCheckPath: /api/health
     envVars:
@@ -73,7 +72,5 @@ services:
         source: /*
         destination: /index.html
     envVars:
-      # IMPORTANT: After Blueprint creation, update this with your actual API URL
-      # Example: https://team-collaboration-api.onrender.com
       - key: VITE_API_URL
-        value: https://team-collaboration-api.onrender.com
+        value: https://team-collaboration-api-bwvy.onrender.com
