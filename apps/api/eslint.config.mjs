@@ -2,7 +2,7 @@ import { config } from '@tc/eslint-config/base';
 
 export default [
   {
-    ignores: ['eslint.config.mjs']
+    ignores: ['eslint.config.mjs', 'src/migrations/**']
   },
   ...config,
   {

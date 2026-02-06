@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { validateLoginFields } from '../../utils/validation';
 import Toast from '../ui/Toast';
@@ -166,6 +166,11 @@ const SignupPage = () => {
             Create Account
           </button>
         </form>
+        <div className="text-center mt-5">
+          <Link to="/login" className="text-blue-700 no-underline hover:underline">
+            Already have an account? Login
+          </Link>
+        </div>
       </main>
     </section>
   );

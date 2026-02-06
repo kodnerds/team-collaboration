@@ -11,7 +11,7 @@
     "express": "^5.1.0",
     "express-validator": "^7.3.1",
     "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "9.0.3",
     "pg": "^8.14.1",
     "reflect-metadata": "^0.2.2",
     "swagger-jsdoc": "^6.2.8",
@@ -23,6 +23,7 @@
     "@tc/eslint-config": "*",
     "@tc/typescript-config": "*",
     "@testcontainers/postgresql": "^11.8.1",
+    "cross-env": "^7.0.3",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/helmet": "^0.0.48",
@@ -43,9 +44,8 @@
     "typescript": "^5.8.2"
   },
   "scripts": {
-    "typeorm": "typeorm-ts-node-commonjs",
     "build": "rimraf dist && tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/src/index.js",
     "dev:local": "nodemon src/index.ts",
     "dev": "docker compose up",
     "lint": "eslint . --max-warnings=0 && tsc --noEmit && tsc --noEmit -p test/tsconfig.json",
@@ -55,6 +55,10 @@
     "docker:run-build": "docker compose up --build",
     "docker:build": "docker compose build",
     "docker:stop": "docker compose down",
-    "test": "jest"
+    "test": "jest",
+    "typeorm": "npm run build && cross-env POSTGRES_HOST=localhost npx typeorm -d dist/src/database/data-source.js",
+    "migration:generate": "npm run typeorm migration:generate src/migrations/new-migration",
+    "migration:run": "npm run typeorm migration:run",
+    "migration:revert": "npm run typeorm migration:revert"
   }
 }
