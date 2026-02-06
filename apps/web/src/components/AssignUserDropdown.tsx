@@ -52,7 +52,10 @@ export const AssignUserDropdown = ({ taskId, assignedUserIds, onAssign, onClose 
           <button
             key={m.id}
             disabled={isAssigned || isLoading}
-            onClick={() => handleAssign(m.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAssign(m.id);
+            }}
             className={`flex items-center gap-2 px-3 py-2 w-full text-left
               ${isAssigned ? 'bg-blue-50 cursor-not-allowed' : 'hover:bg-gray-100'}
             `}

@@ -128,7 +128,8 @@ export const TaskCard = ({
                   Edit
                 </button>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     onDelete(task.id);
                     setIsMenuOpen(false);
                   }}
