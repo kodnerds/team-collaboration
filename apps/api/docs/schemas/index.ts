@@ -30,6 +30,8 @@ import {
   TaskListResponseSchema,
   TaskResponseSchema,
   TaskSchema,
+  UnassignUsersFromTaskResponseDataSchema,
+  UnassignUsersFromTaskResponseSchema,
   UpdateTaskRequestSchema
 } from './task.schema';
 import { UserSchema, UserMinimalSchema } from './user.schema';
@@ -71,6 +73,8 @@ export const schemas = {
   TaskListResponse: TaskListResponseSchema,
   AssignUsersToTaskRequest: AssignUsersToTaskRequestSchema,
   AssignUsersToTaskResponseData: AssignUsersToTaskResponseDataSchema,
-  AssignUsersToTaskResponse: AssignUsersToTaskResponseSchema
+  AssignUsersToTaskResponse: AssignUsersToTaskResponseSchema,
+  UnassignUsersFromTaskResponseData: UnassignUsersFromTaskResponseDataSchema,
+  UnassignUsersFromTaskResponse: UnassignUsersFromTaskResponseSchema
 };
 

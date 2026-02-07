@@ -325,3 +325,62 @@ export const deleteTask = async (req: Request, res: Response) => {
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
   }
 };
+
+export const unassignUserFromTask = async (req: Request, res: Response) => {
+  try {
+    const { taskId, projectId } = req.params;
+    const { userIds } = req.body;
+
+    if (!taskId || !projectId) {
+      return res
+        .status(HTTP_STATUS.BAD_REQUEST)
+        .json({ message: 'Task ID and Project ID are required' });
+    }
+
+    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'User IDs are required' });
+    }
+
+    const projectRepository = new ProjectRepository();
+    const project = await projectRepository.findOne(projectId);
+
+    if (!project) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Project not found' });
+    }
+
+    const taskRepository = new TaskRepository();
+    const task = await taskRepository.findOne(taskId);
+
+    if (!task) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Task not found' });
+    }
+
+    const userRepository = new UserRepository();
+    const users = await userRepository.findByIds(userIds);
+
+    if (users.length !== userIds.length) {
+      return res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'One or more users not found' });
+    }
+
+    if (!task.assignees) {
+      return res
+        .status(HTTP_STATUS.NOT_FOUND)
+        .json({ message: 'Task does not have any assignees' });
+    }
+
+    task.assignees = task.assignees.filter((assignee) => !userIds.includes(assignee.id));
+    await taskRepository.save(task);
+    return res.status(HTTP_STATUS.OK).json({
+      message: 'User unassigned from task successfully',
+      data: {
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        status: task.status
+      }
+    });
+  } catch (error) {
+    logger.error(error);
+    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+  }
+};

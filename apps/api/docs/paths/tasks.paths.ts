@@ -368,5 +368,113 @@ export const taskPaths = {
         }
       }
     }
+  },
+  '/projects/{projectId}/tasks/{taskId}/unassign': {
+    post: {
+      tags: ['Tasks'],
+      summary: 'Unassign users from a task',
+      description:
+        'Remove one or more users from a task. This removes the users from the task assignees list.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          in: 'path',
+          name: 'projectId',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid'
+          },
+          description: 'Project ID'
+        },
+        {
+          in: 'path',
+          name: 'taskId',
+          required: true,
+          schema: {
+            type: 'string',
+            format: 'uuid'
+          },
+          description: 'Task ID'
+        }
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/AssignUsersToTaskRequest'
+            }
+          }
+        }
+      },
+      responses: {
+        '200': {
+          description: 'User unassigned from task successfully',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/UnassignUsersFromTaskResponse'
+              }
+            }
+          }
+        },
+        '400': {
+          description: 'Bad Request - Invalid or empty user list, or missing required fields',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  message: {
+                    type: 'string',
+                    examples: {
+                      userIds: {
+                        value: 'User IDs are required'
+                      },
+                      ids: {
+                        value: 'Task ID and Project ID are required'
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        '401': {
+          $ref: '#/components/responses/UnauthorizedError'
+        },
+        '404': {
+          description: 'Not Found - Project, task, users, or task has no assignees',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  message: {
+                    type: 'string',
+                    examples: {
+                      project: {
+                        value: 'Project not found'
+                      },
+                      task: {
+                        value: 'Task not found'
+                      },
+                      users: {
+                        value: 'One or more users not found'
+                      },
+                      noAssignees: {
+                        value: 'Task does not have any assignees'
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 };
