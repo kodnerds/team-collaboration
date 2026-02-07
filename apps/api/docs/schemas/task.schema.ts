@@ -309,3 +309,45 @@ export const AssignUsersToTaskResponseSchema = {
     }
   }
 };
+
+export const UnassignUsersFromTaskResponseDataSchema = {
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+      format: 'uuid',
+      description: 'Task unique identifier',
+      example: 'task456'
+    },
+    title: {
+      type: 'string',
+      description: 'Task title',
+      example: 'Design UI screens'
+    },
+    description: {
+      type: 'string',
+      description: 'Task description',
+      example: 'Create wireframes and mockups for the new UI',
+      nullable: true
+    },
+    status: {
+      type: 'string',
+      enum: ['todo', 'doing', 'in_review', 'approved', 'done'],
+      description: 'Task status',
+      example: 'todo'
+    }
+  }
+};
+
+export const UnassignUsersFromTaskResponseSchema = {
+  type: 'object',
+  properties: {
+    message: {
+      type: 'string',
+      example: 'User unassigned from task successfully'
+    },
+    data: {
+      $ref: '#/components/schemas/UnassignUsersFromTaskResponseData'
+    }
+  }
+};
