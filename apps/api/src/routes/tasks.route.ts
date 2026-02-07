@@ -6,7 +6,8 @@ import {
   getTask,
   getAllTasks,
   assignUserToTask,
-  deleteTask
+  deleteTask,
+  unassignUserFromTask
 } from '../controller';
 import {
   validate,
@@ -28,6 +29,13 @@ router.post(
   assignUserToTaskValidator,
   validate,
   assignUserToTask
+);
+router.post(
+  '/:projectId/tasks/:taskId/unassign',
+  authenticate,
+  assignUserToTaskValidator,
+  validate,
+  unassignUserFromTask
 );
 router.delete('/:projectId/tasks/:taskId', authenticate, deleteTask);
 
